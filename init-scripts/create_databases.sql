@@ -1,0 +1,2 @@
+CREATE DATABASE gamification;
+CREATE DATABASE backend;
