@@ -1,0 +1,109 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-container">
+  <mat-card class="card">
+    <mat-card-header>
+      <mat-card-title>Rule Creation</mat-card-title>
+    </mat-card-header>
+    <mat-card-content class="card-content">
+      <mat-form-field class="full-width">
+        <mat-label>Game</mat-label>
+        <mat-select formControlName="game" (selectionChange)="onGameSelect($event)" required>
+          <mat-option *ngFor="let game of games" [value]=game>
+            {{game.subjectAcronym}}
+            {{game.course}}/{{game.course + 1}}
+            {{game.period}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <div class="condition-selector">
+        <mat-form-field class="half-width">
+          <mat-label>Evaluable action</mat-label>
+          <mat-select formControlName="evaluableAction" (selectionChange)="openAiParameterChange()" required>
+            <mat-select-trigger *ngIf="form.get('evaluableAction')?.value">
+              {{(form.get('evaluableAction')?.value).id}}
+            </mat-select-trigger>
+            <mat-option *ngFor="let evaluableAction of evaluableActions" [value]=evaluableAction>
+              <span>{{evaluableAction.id}}</span>
+              <div class="evaluable-info">
+                {{evaluableAction.description}}
+              </div>
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <div class="condition-selector">
+          <mat-form-field>
+            <mat-label>Condition</mat-label>
+            <mat-select formControlName="achievementAssignmentCondition" (selectionChange)="conditionChange()" required>
+              <mat-option *ngFor="let condition of conditions" [value]=condition[0]>
+                {{condition[1]}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <div formArrayName="achievementAssignmentParameters">
+            <div *ngFor="let parameter of achievementAssignmentParameters.controls; let i = index">
+              <mat-form-field>
+                <mat-label>Parameter</mat-label>
+                <input matInput [formControlName]="i" type="number" (input)="openAiParameterChange()" required>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+      </div>
+      <mat-form-field class="full-width">
+        <mat-label>Achievement</mat-label>
+        <mat-select formControlName="achievement" required>
+          <mat-option *ngFor="let achievement of achievements" [value]=achievement.id>
+            {{achievement.name}}
+            {{achievement.category}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <div class="horizontal-element-container">
+        <div class="group-selector">
+          <mat-label class="label-title">Rule Type:</mat-label>
+          <mat-radio-group formControlName="ruleType">
+            <mat-radio-button color="primary" value="simple">
+              <span class="label">Simple</span>
+            </mat-radio-button>
+            <mat-radio-button color="primary" value="date">
+              <span class="label">Date</span>
+            </mat-radio-button>
+          </mat-radio-group>
+        </div>
+        <mat-form-field class="number-container radio-adjacent">
+          <mat-label>Repetitions to assign</mat-label>
+          <input matInput formControlName="repetitions" type="number" placeholder="1" min="1" required>
+        </mat-form-field>
+        <mat-form-field class="number-container">
+          <mat-label>Achievement Assignment Units</mat-label>
+          <input matInput formControlName="achievementAssignmentUnits" type="number" required>
+        </mat-form-field>
+        <mat-checkbox formControlName="onlyFirstTime" color="primary" class="group-selector">
+          <span class="label">Allow assignment only the first time</span>
+        </mat-checkbox>
+      </div>
+      <div *ngIf="form.get('ruleType')?.value === 'date'" class="full-width group-selector">
+        <mat-form-field class="half-width">
+          <mat-label>Rule Period</mat-label>
+          <mat-date-range-input [rangePicker]="picker">
+            <input matStartDate readonly placeholder="Start date" formControlName="startDate" required>
+            <input matEndDate readonly placeholder="End date" formControlName="endDate" required>
+          </mat-date-range-input>
+          <mat-hint>DD/MM/YYYY – DD/MM/YYYY</mat-hint>
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-date-range-picker touchUi="true" #picker></mat-date-range-picker>
+        </mat-form-field>
+      </div>
+      <button mat-raised-button color="primary" type="button" class="group-selector" (click)="getRecommendedNameMessage()" [disabled]="!canCallOpenAI">Propose name and message for the rule</button>
+      <p *ngIf="fetchingOpenAI">Recommended name and message for the rule are being fetched</p>
+      <mat-form-field class="full-width">
+        <mat-label>Name</mat-label>
+        <input matInput formControlName="name" required>
+      </mat-form-field>
+      <mat-form-field class="full-width">
+        <mat-label>Achievement Assignment Message</mat-label>
+        <textarea matInput formControlName="achievementAssignmentMessage" required></textarea>
+      </mat-form-field>
+    </mat-card-content>
+  </mat-card>
+  <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">Submit</button>
+</form>

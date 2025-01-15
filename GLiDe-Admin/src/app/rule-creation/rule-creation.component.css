@@ -1,0 +1,48 @@
+.label {
+  font-size: 18px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.label-title{
+  font-size: 18px;
+  margin-left: 20px;
+}
+
+.group-selector{
+  margin-bottom: 20px;
+}
+
+.condition-selector{
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.horizontal-element-container{
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  align-items: center;
+}
+
+.add-button{
+  margin-top: 10px;
+}
+
+.delete-button{
+  margin-left: 10px;
+}
+
+.evaluable-info{
+  margin-left: 20px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.number-container{
+  width:  20%;
+}
+
+.radio-adjacent{
+  margin-left: 40px;
+}

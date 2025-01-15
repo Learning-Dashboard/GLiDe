@@ -1,0 +1,89 @@
+.label {
+  font-size: 18px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.date-selector {
+  margin-bottom: 10px;
+}
+
+.horizontal-element-container{
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  align-items: flex-start;
+  margin-top: 20px;
+  justify-content: center;
+}
+
+.card-title{
+  margin-bottom: 20px;
+}
+
+.scroll{
+  height: 300px;
+  border: 1px solid black;
+}
+
+.third-width{
+  width: 35%;
+}
+
+.rule-container{
+  height: 400px;
+  overflow: auto;
+}
+
+.button-label-container{
+  display: flex;
+  align-items: center;
+  gap: 10px
+}
+
+.import-button{
+  scale: 0.75;
+}
+
+.condition-selector{
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.group-input {
+  width: 90%;
+}
+
+.delete-button {
+  margin-left: 10px;
+}
+
+.add-button {
+  margin-top: 10px;
+}
+
+.rule-info-paragraf {
+  font-size: 18px;
+  line-height: 2;
+}
+
+.file-button-container {
+  margin-bottom: 20px;
+  margin-left: 20px;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.file-button {
+  width: 33%;
+  margin-left: 50px;
+}
+
+.graph-container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 500px;
+}

@@ -1,0 +1,94 @@
+<mat-card class="form-container card">
+  <mat-card-title class="card-title">Rules</mat-card-title>
+  <form [formGroup]="ruleForm">
+    <mat-form-field class="full-width">
+      <mat-label>Simple Rule</mat-label>
+      <mat-select formControlName="rule" (selectionChange)="selectRule()">
+        <mat-option *ngFor="let rule of rules" [value]=rule>
+          {{rule.name}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-card-content class="card-content">
+      <mat-card *ngIf="selectedRule" class="card card-content form-container">
+        <div class="condition-selector">
+          <mat-form-field class="half-width">
+            <mat-label>Evaluable action</mat-label>
+            <mat-select formControlName="evaluableAction" (selectionChange)="selectEvaluableAction()" required>
+              <mat-select-trigger *ngIf="selectedEvaluableAction">
+                {{selectedEvaluableAction.id}}
+              </mat-select-trigger>
+              <mat-option *ngFor="let evaluableAction of evaluableActions" [value]=evaluableAction.id>
+                <span>{{evaluableAction.id}}</span>
+                <div class="evaluable-info">
+                  {{evaluableAction.description}}
+                </div>
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <div class="condition-selector">
+            <mat-form-field>
+              <mat-label>Condition</mat-label>
+              <mat-select formControlName="achievementAssignmentCondition" (selectionChange)="conditionChange()" required>
+                <mat-option *ngFor="let condition of conditions" [value]=condition[0]>
+                  {{condition[1]}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <div formArrayName="achievementAssignmentParameters">
+              <div *ngFor="let parameter of achievementAssignmentParameters.controls; let i = index">
+                <mat-form-field>
+                  <mat-label>Parameter</mat-label>
+                  <input matInput [formControlName]="i" type="number" required>
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="label card-title">
+          Achievement Name: {{(ruleForm.get('achievement')?.value).name}}
+        </div>
+        <div class="label card-title">
+          Achievement Category: {{(ruleForm.get('achievement')?.value).category}}
+        </div>
+        <div class="horizontal-element-container">
+          <mat-form-field class="number-container">
+            <mat-label>Repetitions to assign</mat-label>
+            <input matInput formControlName="repetitions" type="number" placeholder="1" min="1" required>
+          </mat-form-field>
+          <mat-form-field class="number-container">
+            <mat-label>Achievement Assignment Units</mat-label>
+            <input matInput formControlName="achievementAssignmentUnits" type="number" required>
+          </mat-form-field>
+          <mat-checkbox formControlName="onlyFirstTime" color="primary" class="group-selector">
+            <span class="label">Allow assignment only the first time</span>
+          </mat-checkbox>
+        </div>
+        <div *ngIf="ruleType === 'date'" class="full-width group-selector">
+          <mat-form-field class="half-width">
+            <mat-label>Rule Period</mat-label>
+            <mat-date-range-input [rangePicker]="picker">
+              <input matStartDate readonly placeholder="Start date" formControlName="startDate" required>
+              <input matEndDate readonly placeholder="End date" formControlName="endDate" required>
+            </mat-date-range-input>
+            <mat-hint>DD/MM/YYYY – DD/MM/YYYY</mat-hint>
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-date-range-picker touchUi="true" #picker></mat-date-range-picker>
+          </mat-form-field>
+        </div>
+        <mat-form-field class="full-width">
+          <mat-label>Name</mat-label>
+          <input matInput formControlName="name" required>
+        </mat-form-field>
+        <mat-form-field class="full-width">
+          <mat-label>Achievement Assignment Message</mat-label>
+          <textarea matInput formControlName="achievementAssignmentMessage" required></textarea>
+        </mat-form-field>
+        <div class="button-div">
+          <button mat-raised-button color="primary" type="button" (click)="editRule()">Submit Changes</button>
+          <button mat-raised-button color="primary" type="button" class="delete-button" (click)="deleteRule()">Delete</button>
+        </div>
+      </mat-card>
+    </mat-card-content>
+  </form>
+</mat-card>

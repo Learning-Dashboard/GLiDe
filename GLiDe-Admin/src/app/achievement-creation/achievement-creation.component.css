@@ -1,0 +1,27 @@
+.file-button {
+  width: 33%;
+  margin-left: 50px;
+}
+
+.file-button-container {
+  margin-bottom: 20px;
+  margin-left: 20px;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.file-button-label {
+  font-size: 18px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.preview-image {
+  width: auto;
+  height: 200px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  margin-left: 125px;
+  margin-bottom: 20px;
+}

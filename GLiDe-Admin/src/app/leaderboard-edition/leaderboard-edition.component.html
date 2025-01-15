@@ -1,0 +1,62 @@
+<mat-card class="form-container card">
+  <mat-card-title class="card-title">Leaderboards</mat-card-title>
+  <form [formGroup]="leaderboardForm">
+    <mat-form-field class="full-width">
+      <mat-label>Leaderboard</mat-label>
+      <mat-select formControlName="leaderboard" (selectionChange)="onLeaderboardSelect()">
+        <mat-option *ngFor="let leaderboard of leaderboards" [value]=leaderboard>
+          {{leaderboard.name}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-card-content class="card-content">
+      <mat-card *ngIf="selectedLeaderboard" class="card card-content form-container">
+        <mat-form-field class="full-width">
+          <mat-label>Achievement</mat-label>
+          <mat-select formControlName="achievement" required>
+            <mat-option *ngFor="let achievement of achievements" [value]=achievement.id>
+              {{achievement.name}}
+              {{achievement.category}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="full-width">
+          <mat-label>Name</mat-label>
+          <input matInput formControlName="name" required>
+        </mat-form-field>
+        <mat-form-field class="date-container half-width">
+          <mat-label>Leaderboard Period</mat-label>
+          <mat-date-range-input [rangePicker]="picker">
+            <input matStartDate readonly placeholder="Start date" formControlName="startDate" required>
+            <input matEndDate readonly placeholder="End date" formControlName="endDate" required>
+          </mat-date-range-input>
+          <mat-hint>DD/MM/YYYY – DD/MM/YYYY</mat-hint>
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-date-range-picker touchUi="true" #picker></mat-date-range-picker>
+        </mat-form-field>
+        <mat-form-field class="full-width">
+          <mat-label>Assessment Level</mat-label>
+          <mat-select formControlName="assessmentLevel" required>
+            <mat-option value="Team">Team</mat-option>
+            <mat-option value="Individual">Individual</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="full-width">
+          <mat-label>Anonymization</mat-label>
+          <mat-select formControlName="anonymization" required>
+            <mat-option value="Full">Full</mat-option>
+            <mat-option value="Partial">Partial</mat-option>
+            <mat-option value="None">None</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-checkbox formControlName="studentVisible" color="primary">
+          <span class="label">Visible to students</span>
+        </mat-checkbox>
+        <div class="button-div">
+          <button mat-raised-button color="primary" type="button" (click)="editLeaderboard()">Submit Changes</button>
+          <button mat-raised-button color="primary" type="button" class="delete-button" (click)="deleteLeaderboard()">Delete</button>
+        </div>
+      </mat-card>
+    </mat-card-content>
+  </form>
+</mat-card>

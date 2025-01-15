@@ -1,0 +1,38 @@
+<mat-tab-group style="height: 90%;">
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <mat-icon class="tab-icon">games</mat-icon>
+      Games
+    </ng-template>
+    <ng-template matTabContent>
+      <app-game-tabs></app-game-tabs>
+    </ng-template>
+  </mat-tab>
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <mat-icon class="tab-icon">bookmarks</mat-icon>
+      Achievements
+    </ng-template>
+    <ng-template matTabContent>
+        <app-achievement-creation></app-achievement-creation>
+    </ng-template>
+  </mat-tab>
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <mat-icon class="tab-icon">rule</mat-icon>
+      Rules
+    </ng-template>
+    <ng-template matTabContent>
+      <app-rule-creation></app-rule-creation>
+    </ng-template>
+  </mat-tab>
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <mat-icon class="tab-icon">leaderboard</mat-icon>
+      Leaderboards
+    </ng-template>
+    <ng-template matTabContent>
+      <app-leaderboard-creation></app-leaderboard-creation>
+    </ng-template>
+  </mat-tab>
+</mat-tab-group>

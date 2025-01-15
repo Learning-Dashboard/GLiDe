@@ -1,0 +1,100 @@
+<div class="form-container">
+  <mat-card class="card">
+    <mat-card-content class="card-content">
+      <mat-stepper [linear]="true">
+        <mat-step [stepControl]="gameForm" label="Game">
+          <mat-card class="form-container card">
+            <form [formGroup]="gameForm">
+              <mat-card-title class="card-title">Select Game</mat-card-title>
+              <mat-form-field class="full-width">
+                <mat-label>Game</mat-label>
+                <mat-select formControlName="game" (selectionChange)="onGameSelect()" required>
+                  <mat-option *ngFor="let game of games" [value]=game>
+                    {{game.subjectAcronym}}
+                    {{game.course}}/{{game.course + 1}}
+                    {{game.period}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </form>
+          </mat-card>
+          <div>
+            <button mat-button matStepperNext color="primary">Next</button>
+          </div>
+        </mat-step>
+        <mat-step label="Date Range">
+          <mat-card class="form-container card">
+            <mat-card-title class="card-title">Edit Game Period</mat-card-title>
+            <form [formGroup]="dateForm">
+              <mat-form-field class="date-selector half-width">
+                <mat-label>Game Period</mat-label>
+                <mat-date-range-input [rangePicker]="picker">
+                  <input matStartDate readonly placeholder="Start date" formControlName="startDate" required>
+                  <input matEndDate readonly placeholder="End date" formControlName="endDate" required>
+                </mat-date-range-input>
+                <mat-hint>DD/MM/YYYY – DD/MM/YYYY</mat-hint>
+                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-date-range-picker touchUi="true" #picker></mat-date-range-picker>
+              </mat-form-field>
+              <div>
+                <button mat-raised-button color="primary" class="card-title" (click)="updateGame()" [disabled]="dateForm.invalid">
+                  Submit
+                </button>
+              </div>
+            </form>
+          </mat-card>
+          <div>
+            <button mat-button matStepperPrevious color="primary">Back</button>
+            <button mat-button matStepperNext color="primary">Next</button>
+          </div>
+        </mat-step>
+        <mat-step label="Simple Rules">
+          <app-rule-edition [rules]="simpleRules" [ruleType]="'simple'" [achievements]="achievements" [evaluableActions]="evaluableActions">
+          </app-rule-edition>
+          <div>
+            <button mat-button matStepperPrevious color="primary">Back</button>
+            <button mat-button matStepperNext color="primary">Next</button>
+          </div>
+        </mat-step>
+        <mat-step label="Date Rules">
+          <app-rule-edition [rules]="dateRules" [ruleType]="'date'" [achievements]="achievements" [evaluableActions]="evaluableActions">
+          </app-rule-edition>
+          <div>
+            <button mat-button matStepperPrevious color="primary">Back</button>
+            <button mat-button matStepperNext color="primary">Next</button>
+          </div>
+        </mat-step>
+        <mat-step label="Leaderboards">
+          <app-leaderboard-edition [leaderboards]="leaderboards" [achievements]="achievements" [game]="game">
+          </app-leaderboard-edition>
+          <div>
+            <button mat-button matStepperPrevious color="primary">Back</button>
+            <button mat-button matStepperNext color="primary">Next</button>
+          </div>
+        </mat-step>
+        <mat-step label="Players and Teams">
+          <mat-card class="card">
+            <mat-card-title class="card-title">Import Users and Teams</mat-card-title>
+            <mat-card-content class="card-content">
+              <div class="full-width file-button-container">
+                <label class="label">CSV File</label>
+                <button mat-raised-button color="primary" type="button" class="file-button" (click)="fileInput.click()">Choose File</button>
+                <input hidden (change)="onFileSelected($event)" #fileInput type="file" id="file" accept=".csv">
+                <span class="file-name">{{selectedFile?.name}}</span>
+                <button *ngIf="selectedFile" mat-mini-fab color="primary" aria-label="Delete file" type="button" (click)="deleteFile(fileInput)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+              <button mat-raised-button color="primary" class="card-title" (click)="submitCSV(fileInput)" [disabled]="!selectedFile">
+                Submit
+              </button>
+            </mat-card-content>
+          </mat-card>
+          <div>
+            <button mat-button matStepperPrevious color="primary">Back</button>
+          </div>
+        </mat-step>
+      </mat-stepper>
+    </mat-card-content>
+  </mat-card>
+</div>

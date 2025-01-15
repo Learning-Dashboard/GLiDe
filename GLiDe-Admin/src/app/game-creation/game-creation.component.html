@@ -1,0 +1,260 @@
+<div class="form-container">
+  <mat-card class="card">
+    <mat-card-content class="card-content">
+      <mat-stepper [linear]="true" (selectionChange)="onSelectionChange($event)" #stepper>
+        <mat-step [stepControl]="subjectType === 'new' ? subjectForm : existingSubjectForm" label="Subject">
+          <mat-radio-group [(ngModel)]="subjectType">
+            <mat-radio-button color="primary" value="existing">
+              <span class="label">Create game from existing subject</span>
+            </mat-radio-button>
+            <mat-radio-button color="primary" value="new">
+              <span class="label">Create game from new subject</span>
+            </mat-radio-button>
+          </mat-radio-group>
+          <mat-card class="form-container card">
+            <form *ngIf="subjectType === 'existing'" [formGroup]="existingSubjectForm">
+              <mat-card-title class="card-title">Select Existing Subject</mat-card-title>
+              <mat-form-field class="full-width">
+                <mat-label>Subject</mat-label>
+                <mat-select formControlName="subject" required>
+                  <mat-option *ngFor="let subject of existingSubjects" [value]=subject>
+                    {{subject.acronym}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </form>
+            <form *ngIf="subjectType === 'new'" [formGroup]="subjectForm">
+              <mat-card-title class="card-title">New Subject Attributes</mat-card-title>
+              <mat-form-field class="full-width">
+                <mat-label>Acronym</mat-label>
+                <input matInput formControlName="acronym" required>
+              </mat-form-field>
+              <mat-form-field class="full-width">
+                <mat-label>Name</mat-label>
+                <input matInput formControlName="name" required>
+              </mat-form-field>
+              <mat-form-field class="full-width">
+                <mat-label>Code</mat-label>
+                <input matInput formControlName="code" type="number" required>
+              </mat-form-field>
+              <mat-form-field class="full-width">
+                <mat-label>Studies</mat-label>
+                <input matInput formControlName="studies" required>
+              </mat-form-field>
+              <mat-form-field class="full-width">
+                <mat-label>School</mat-label>
+                <input matInput formControlName="school" required>
+              </mat-form-field>
+            </form>
+          </mat-card>
+          <div>
+            <button mat-button matStepperNext color="primary">Next</button>
+          </div>
+        </mat-step>
+        <mat-step [stepControl]="gameForm" label="Game">
+          <mat-card class="form-container card">
+            <form [formGroup]="gameForm">
+              <input hidden formControlName="valid" required>
+              <mat-card-title class="card-title">Create Game</mat-card-title>
+              <div class="horizontal-element-container">
+                <mat-form-field class="third-width">
+                  <mat-label>First Year of Course</mat-label>
+                  <input matInput formControlName="course" type="number" min="0" required>
+                </mat-form-field>
+                <mat-form-field class="third-width">
+                  <mat-label>Quadrimester</mat-label>
+                  <mat-select formControlName="period" required>
+                    <mat-option value="Quadrimester1">Q1</mat-option>
+                    <mat-option value="Quadrimester2">Q2</mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <mat-form-field class="date-selector third-width">
+                  <mat-label>Game Period</mat-label>
+                  <mat-date-range-input [rangePicker]="picker">
+                    <input matStartDate readonly placeholder="Start date" formControlName="start_date" required>
+                    <input matEndDate readonly placeholder="End date" formControlName="end_date" required (dateChange)="noInvalidDateRange()">
+                  </mat-date-range-input>
+                  <mat-hint>DD/MM/YYYY – DD/MM/YYYY</mat-hint>
+                  <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                  <mat-date-range-picker touchUi="true" #picker></mat-date-range-picker>
+                </mat-form-field>
+              </div>
+            </form>
+            <mat-card-title class="card-title">Import Rules</mat-card-title>
+            <mat-form-field class="full-width">
+              <mat-label>Game</mat-label>
+              <mat-select (selectionChange)="onGameSelect($event)">
+                <mat-option *ngFor="let game of games" [value]=game>
+                  {{game.subjectAcronym}}
+                  {{game.course}}/{{game.course + 1}}
+                  {{game.period}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <div *ngIf="simpleRules">
+              <mat-card-title class="card-title">Simple Rules</mat-card-title>
+              <button mat-raised-button color="primary" type="button" (click)="importAllSimpleRules()">Import All</button>
+              <div class="horizontal-element-container">
+                <mat-card class="half-width form-container card">
+                  <mat-card-content class="rule-container">
+                    <mat-list>
+                      <mat-list-item *ngFor="let simpleRule of simpleRules; index as i" (click)="selectSimpleRule(simpleRule)">
+                        <div class="button-label-container">
+                          <button mat-mini-fab color="primary" aria-label="Add Rule" type="button" (click)="importSimpleRule(i)" class="import-button">
+                            <mat-icon>add</mat-icon>
+                          </button>
+                          {{simpleRule.name}}
+                        </div>
+                      </mat-list-item>
+                    </mat-list>
+                  </mat-card-content>
+                </mat-card>
+                <mat-card class="half-width form-container card">
+                  <mat-card-content class="rule-container">
+                    <mat-list>
+                      <mat-list-item *ngFor="let simpleRule of importedSimpleRules; index as i" (click)="selectSimpleRule(simpleRule)">
+                        <div class="button-label-container">
+                          <button mat-mini-fab color="primary" aria-label="Remove Rule" type="button" (click)="removeImportedSimpleRule(i)" class="import-button">
+                            <mat-icon>remove</mat-icon>
+                          </button>
+                          {{simpleRule.name}}
+                        </div>
+                      </mat-list-item>
+                    </mat-list>
+                  </mat-card-content>
+                </mat-card>
+              </div>
+            </div>
+            <mat-card *ngIf="selectedSimpleRule" class="form-container card full-width">
+              <p class="rule-info-paragraf">
+                Name: {{selectedSimpleRule.name}}<br>
+                Message: {{selectedSimpleRule.achievementAssignmentMessage}}<br>
+                Assigned only first time: {{selectedSimpleRule.achievementAssignmentOnlyFirstTime}}<br>
+                Evaluable action: {{selectedSimpleRule.evaluableActionId}}<br>
+                Condition: {{selectedSimpleRule.achievementAssignmentCondition}}<br>
+                Condition parameters: {{selectedSimpleRule.achievementAssignmentConditionParameters}}<br>
+              </p>
+            </mat-card>
+            <div *ngIf="dateRules">
+              <mat-card-title class="card-title">Date Rules</mat-card-title>
+              <button mat-raised-button color="primary" type="button" (click)="importAllDateRules()">Import All</button>
+              <div class="horizontal-element-container">
+                <mat-card class="half-width form-container card">
+                  <mat-card-content class="rule-container">
+                    <mat-list>
+                      <mat-list-item *ngFor="let dateRule of dateRules; index as i" (click)="selectDateRule(dateRule)">
+                        <div class="button-label-container">
+                          <button mat-mini-fab color="primary" aria-label="Add Rule" type="button" (click)="importDateRule(i)" class="import-button">
+                            <mat-icon>add</mat-icon>
+                          </button>
+                          {{dateRule.name}}
+                        </div>
+                      </mat-list-item>
+                    </mat-list>
+                  </mat-card-content>
+                </mat-card>
+                <mat-card class="half-width form-container card">
+                  <mat-card-content class="rule-container">
+                    <mat-list>
+                      <mat-list-item *ngFor="let dateRule of importedDateRules; index as i" (click)="selectDateRule(dateRule)">
+                        <div class="button-label-container">
+                          <button mat-mini-fab color="primary" aria-label="Remove Rule" type="button" (click)="removeImportedDateRule(i)" class="import-button">
+                            <mat-icon>remove</mat-icon>
+                          </button>
+                          {{dateRule.name}}
+                          <mat-icon *ngIf="invalidDates(dateRule)" title="Invalid dates for game" color="warn">error</mat-icon>
+                        </div>
+                      </mat-list-item>
+                    </mat-list>
+                  </mat-card-content>
+                </mat-card>
+              </div>
+            </div>
+            <mat-card *ngIf="selectedDateRule" class="form-container card full-width">
+              <p class="rule-info-paragraf">
+                Name: {{selectedDateRule.name}}<br>
+                Message: {{selectedDateRule.achievementAssignmentMessage}}<br>
+                Assigned only first time: {{selectedDateRule.achievementAssignmentOnlyFirstTime}}<br>
+                Evaluable action: {{selectedDateRule.evaluableActionId}}<br>
+                Condition: {{selectedDateRule.achievementAssignmentCondition}}<br>
+                Condition parameters: {{selectedDateRule.achievementAssignmentConditionParameters}}<br>
+              </p>
+              <div class="rule-info-paragraf">
+                Dates:
+                <mat-form-field>
+                  <mat-label>Date Range</mat-label>
+                  <mat-date-range-input [rangePicker]="picker">
+                    <input matStartDate readonly placeholder="Start date" [value]=selectedDateRule.startDate required #dateRangeStart>
+                    <input matEndDate readonly placeholder="End date" [value]=selectedDateRule.endDate required #dateRangeEnd (dateChange)="changeDateRuleDates(dateRangeStart, dateRangeEnd)">
+                  </mat-date-range-input>
+                  <mat-hint>DD/MM/YYYY – DD/MM/YYYY</mat-hint>
+                  <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                  <mat-date-range-picker #picker></mat-date-range-picker>
+                </mat-form-field>
+              </div>
+            </mat-card>
+          </mat-card>
+          <div>
+            <button mat-button matStepperPrevious color="primary">Back</button>
+            <button mat-button matStepperNext color="primary">Next</button>
+          </div>
+        </mat-step>
+        <mat-step [stepControl]="gameLevelPolicyForm" label="Game Level Policy">
+          <mat-card class="form-container card">
+            <form [formGroup]="gameLevelPolicyForm">
+              <mat-card-title class="card-title">Create Game Level Policy</mat-card-title>
+              <p>
+                Players will be granted levels according to the amount of points they have acquired. The amount of points needed to level up is determined by the following function:
+                <var>points</var> = <var>a</var> · <var>b</var> <sup>(<var>level</var> · <var>c</var>)</sup><br>
+                If you wish you can change the values of a, b and c to modify the difficulty of leveling up, otherwise you can use the suggested values.
+              </p>
+              <div class="horizontal-element-container">
+                <mat-form-field class="third-width">
+                  <mat-label>a</mat-label>
+                  <input matInput formControlName="a" type="number" placeholder="1" min="0" required>
+                </mat-form-field>
+                <mat-form-field class="third-width">
+                  <mat-label>b</mat-label>
+                  <input matInput formControlName="b" type="number" placeholder="1.4" min="0" required>
+                </mat-form-field>
+                <mat-form-field class="third-width">
+                  <mat-label>c</mat-label>
+                  <input matInput formControlName="c" type="number" placeholder="2" min="0" required>
+                </mat-form-field>
+              </div>
+              <div class="graph-container">
+                <canvas id="levelPoints"></canvas>
+              </div>
+            </form>
+          </mat-card>
+          <div>
+            <button mat-button matStepperPrevious color="primary">Back</button>
+            <button mat-button matStepperNext color="primary">Next</button>
+          </div>
+        </mat-step>
+        <mat-step label="Import Users and Teams">
+          <mat-card class="form-container card">
+            <mat-card-title class="card-title">Import Users and Teams</mat-card-title>
+            <mat-card-content class="card-content">
+              <div class="full-width file-button-container">
+                <label class="label">CSV File (Optional)</label>
+                <button mat-raised-button color="primary" type="button" class="file-button" (click)="fileInput.click()">Choose File</button>
+                <input hidden (change)="onFileSelected($event)" #fileInput type="file" id="file" accept=".csv">
+                <span class="file-name">{{selectedFile?.name}}</span>
+                <button *ngIf="selectedFile" mat-mini-fab color="primary" aria-label="Delete file" type="button" (click)="deleteFile(fileInput)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </mat-card-content>
+          </mat-card>
+          <button mat-raised-button color="primary" class="card-title" (click)="submit(fileInput)" [disabled]="!isFormValid()">
+            Submit
+          </button>
+          <div>
+            <button mat-button matStepperPrevious color="primary">Back</button>
+          </div>
+        </mat-step>
+      </mat-stepper>
+    </mat-card-content>
+  </mat-card>
+</div>
