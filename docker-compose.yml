@@ -2,11 +2,15 @@ services:
   glide-frontend:
     build:
       context: ./GLiDe-Frontend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     ports:
-      - "4201:80"
+      - "4201:4200"
+    volumes:
+      - ./GLiDe-Frontend:/app
+      - /app/node_modules
     networks:
       - app-network
+    command: npm run start
     environment:
       GOOGLE_CLIENT: ${GOOGLE_CLIENT}
 

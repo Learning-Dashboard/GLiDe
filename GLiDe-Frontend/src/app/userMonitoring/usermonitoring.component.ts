@@ -139,15 +139,42 @@ export class UsermonitoringComponent {
     }),
     switchMap(result => {
       this.result_categories = result;
-      let metricsWithCategories = this.result_categories?.map((item: any) => ({externalId: item.externalId, categoryName: item.categoryName}));
-      let categoryName : any;
+      let metricsWithCategories = this.result_categories?.map((item: any) => ({
+        externalId: item.externalId,
+        categoryName: item.categoryName
+      }));
+      
+      let categoryName: any;
+    
       for (let metric in this.metricsId) {
-        if (this.metricsId[metric] == "assignedtasks" || this.metricsId[metric] == "closedtasks") categoryName = metricsWithCategories.find((x: { externalId: string}) => x.externalId === this.metricsId[metric] + '_' + this.user_name_Taiga).categoryName;
-        if (this.metricsId[metric] == "modifiedlines" || this.metricsId[metric] == "commits") categoryName = metricsWithCategories.find((x: { externalId: string}) => x.externalId === this.metricsId[metric] + '_' + this.user_name_GitHub).categoryName;
-        let categoryInformation = this.categoryInformation(categoryName);
-        this.current_categories.push(categoryInformation);
+        let foundCategory;
+      
+        // Normalizar los nombres de usuario para evitar problemas con caracteres especiales
+        const normalizedTaiga = this.user_name_Taiga.replaceAll(/[^a-zA-Z]/g, "_");
+        const normalizedGitHub = this.user_name_GitHub.replaceAll(/[^a-zA-Z]/g, "_");
+
+      
+        if (this.metricsId[metric] === "assignedtasks" || this.metricsId[metric] === "closedtasks") {
+          foundCategory = metricsWithCategories.find((x: { externalId: string }) => 
+            x.externalId === this.metricsId[metric] + '_' + normalizedTaiga);
+        }
+      
+        if (this.metricsId[metric] === "modifiedlines" || this.metricsId[metric] === "commits") {
+          foundCategory = metricsWithCategories.find((x: { externalId: string }) => 
+            x.externalId === this.metricsId[metric] + '_' + normalizedGitHub);
+        }
+      
+        if (foundCategory) {
+          categoryName = foundCategory.categoryName;
+          let categoryInformation = this.categoryInformation(categoryName);
+          this.current_categories.push(categoryInformation);
+        } else {
+          console.warn(`No se encontró categoría para ${this.metricsId[metric]} con user_name_Taiga=${normalizedTaiga} o user_name_GitHub=${normalizedGitHub}`);
+        }
       }
-      return this.service.getMetrics(this.project_name);
+      
+    
+      return this.service.getMetrics(this.project_name);    
     })).subscribe(res => {
       this.result_metrics = res;
       let metrics = [];
@@ -204,12 +231,21 @@ export class UsermonitoringComponent {
           }
         }
 
-        if (this.result_metrics[student].name == this.user_name) {
-          this.current_metrics.push(user_metrics_id.find((x: { id: string}) => x.id === 'assignedtasks_'+this.user_name_Taiga).value);
-          this.current_metrics.push(user_metrics_id.find((x: { id: string}) => x.id === 'closedtasks_'+this.user_name_Taiga).value);
-          this.current_metrics.push(user_metrics_id.find((x: { id: string}) => x.id === 'modifiedlines_'+this.user_name_GitHub).value);
-          this.current_metrics.push(user_metrics_id.find((x: { id: string}) => x.id === 'commits_'+this.user_name_GitHub).value);
+        if (this.result_metrics[student].name === this.user_name) {
+          const getValue = (id: string) => {
+            const metric = user_metrics_id.find((x: { id: string }) => x.id === id);
+            return metric ? metric.value : 0; // Usa 0 o null según tu lógica
+          };
+        
+          const taigaId = this.user_name_Taiga.replaceAll(/[.\- ]/g, "_");
+          const githubId = this.user_name_GitHub.replaceAll(/[.\- ]/g, "_");
+        
+          this.current_metrics.push(getValue('assignedtasks_' + taigaId));
+          this.current_metrics.push(getValue('closedtasks_' + taigaId));
+          this.current_metrics.push(getValue('modifiedlines_' + githubId));
+          this.current_metrics.push(getValue('commits_' + githubId));
         }
+        
       }
 
       dataTasks.push(totalTasks);

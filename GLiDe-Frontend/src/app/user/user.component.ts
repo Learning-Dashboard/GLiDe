@@ -125,18 +125,40 @@ export class UserComponent {
     this.saveUserData();
   }
 
+  onPlayerSelected(playername: string): void {
+    this.selectedPlayer = playername;
+    console.log("Selected player:", this.selectedPlayer);
+    this.saveUserData(); // actualiza localStorage siempre
+    console.log('Guardando datos de:', this.selectedPlayer);
+  }
+  
+
   saveUserData(): void {
+    const selected = this.result.find((x: { playername: string }) => x.playername === this.selectedPlayer);
+    console.log("Trobat:", selected);
+
+    if (!selected) return;
+
+    console.table(this.result);
+
+    function normalizeName(str: string): string {
+      return str.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // elimina accents
+    }
+    
+    const normalizedUsername = normalizeName(selected.learningdashboardUsername);
+
     let points = this.result.find((x: { playername: string}) => x.playername === this.selectedPlayer).points;
     //categoryName = metricsWithCategories.find((x: { externalId: string}) => x.externalId === this.selectedMetrics[metric]).categoryName;
     let level = this.result.find((x: { playername: string}) => x.playername === this.selectedPlayer).level;
     localStorage.setItem('selectedPlayer', this.selectedPlayer);
 
-    localStorage.setItem('username', this.result.find((x: { playername: string}) => x.playername === this.selectedPlayer).learningdashboardUsername);
-    localStorage.setItem('githubUsername', this.result.find((x: { playername: string}) => x.playername === this.selectedPlayer).githubUsername);
-    localStorage.setItem('taigaUsername', this.result.find((x: { playername: string}) => x.playername === this.selectedPlayer).taigaUsername);
-    localStorage.setItem('project', this.result.find((x: { playername: string}) => x.playername === this.selectedPlayer).project);
-    localStorage.setItem('teamPlayername', this.result.find((x: { playername: string}) => x.playername === this.selectedPlayer).teamPlayername);
-    localStorage.setItem('individualPlayername', this.result.find((x: { playername: string}) => x.playername === this.selectedPlayer).playername);
+    localStorage.setItem('username', normalizedUsername);
+    console.log("→ Guardant username:", normalizedUsername);
+    localStorage.setItem('githubUsername', selected.githubUsername);
+    localStorage.setItem('taigaUsername', selected.taigaUsername);
+    localStorage.setItem('project', selected.project);
+    localStorage.setItem('teamPlayername', selected.teamPlayername);
+    localStorage.setItem('individualPlayername', selected.playername);
 
     let individualPlayername: any;
 
@@ -148,7 +170,6 @@ export class UserComponent {
       localStorage.setItem('gameCourse', this.gamification.gameCourse);
       localStorage.setItem('gamePeriod', this.gamification.gamePeriod);
     });
-
   }
 
   logOut() {

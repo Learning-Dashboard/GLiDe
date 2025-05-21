@@ -16,6 +16,8 @@ import edu.upc.gessi.glidegamificationengine.type.StateType;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -26,6 +28,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class GameServiceImpl implements GameService {
+
+    private static final Logger logger = LoggerFactory.getLogger(GameServiceImpl.class);
 
     @Autowired
     private GameRepository gameRepository;
@@ -41,36 +45,49 @@ public class GameServiceImpl implements GameService {
     /* Private methods */
 
     private void evaluateRule(RuleEntity ruleEntity, PlayerEntity playerEntity, Timestamp timestamp) {
-        LoggedActionEntity loggedActionEntity = loggedActionService.getOrCreateLoggedActionEntityByKeyEntities(ruleEntity.getEvaluableActionEntity(), playerEntity, timestamp);
-        Boolean loggedActionEntityAdded = ruleEntity.getAchievementAssignmentEntity().evaluateLoggedActionEntity(loggedActionEntity);
-        if (loggedActionEntityAdded) {
-            Boolean loggedAchievementEntitiesRequired = ruleEntity.evaluateRule(loggedActionEntity.getEvaluableActionEntity().getId(), loggedActionEntity.getPlayerEntity().getPlayername());
-            if (loggedAchievementEntitiesRequired) {
-                if (playerEntity.getType().equals(PlayerType.Team)) {
-                    if (ruleEntity.getAchievementAssignmentEntity().getAssessmentLevel().equals(PlayerType.Team)) {
-                        loggedAchievementService.createLoggedAchievementEntity(Date.valueOf(timestamp.toLocalDateTime().toLocalDate()), ruleEntity.getAchievementAssignmentEntity(), playerEntity);
-                    }
-                    else { //PlayerType.Individual
-                        TeamPlayerEntity teamPlayerEntity = (TeamPlayerEntity) playerEntity;
-                        for (IndividualPlayerEntity individualPlayerEntity : teamPlayerEntity.getIndividualPlayerEntities()) {
-                            loggedAchievementService.createLoggedAchievementEntity(Date.valueOf(timestamp.toLocalDateTime().toLocalDate()), ruleEntity.getAchievementAssignmentEntity(), individualPlayerEntity);
+        logger.info("→ Iniciant evaluateRule per player: {}, acció: {}", playerEntity.getPlayername(), ruleEntity.getEvaluableActionEntity().getId());
+        try {
+            LoggedActionEntity loggedActionEntity = loggedActionService.getOrCreateLoggedActionEntityByKeyEntities(ruleEntity.getEvaluableActionEntity(), playerEntity, timestamp);
+            logger.debug("LoggedAction obtingut: {}", loggedActionEntity.getId());
+            Boolean loggedActionEntityAdded = ruleEntity.getAchievementAssignmentEntity().evaluateLoggedActionEntity(loggedActionEntity);
+            logger.debug("LoggedActionEntity afegit? {}", loggedActionEntityAdded);
+            if (loggedActionEntityAdded) {
+                Boolean loggedAchievementEntitiesRequired = ruleEntity.evaluateRule(loggedActionEntity.getEvaluableActionEntity().getId(), loggedActionEntity.getPlayerEntity().getPlayername());
+                logger.debug("Cal afegir achievement? {}", loggedAchievementEntitiesRequired);
+                if (loggedAchievementEntitiesRequired) {
+                    logger.info("Assignant achievement per jugador {}", playerEntity.getPlayername());
+                    logger.info("RuleEntity: {}", ruleEntity.getId());
+                    logger.info("AchievementAssignmentEntity: {}", ruleEntity.getAchievementAssignmentEntity().getId());
+                    logger.info("AchievementEntity: {}", ruleEntity.getAchievementAssignmentEntity().getAchievementEntity().getId());
+                    if (playerEntity.getType().equals(PlayerType.Team)) {
+                        if (ruleEntity.getAchievementAssignmentEntity().getAssessmentLevel().equals(PlayerType.Team)) {
+                            loggedAchievementService.createLoggedAchievementEntity(Date.valueOf(timestamp.toLocalDateTime().toLocalDate()), ruleEntity.getAchievementAssignmentEntity(), playerEntity);
+                        }
+                        else { //PlayerType.Individual
+                            TeamPlayerEntity teamPlayerEntity = (TeamPlayerEntity) playerEntity;
+                            for (IndividualPlayerEntity individualPlayerEntity : teamPlayerEntity.getIndividualPlayerEntities()) {
+                                loggedAchievementService.createLoggedAchievementEntity(Date.valueOf(timestamp.toLocalDateTime().toLocalDate()), ruleEntity.getAchievementAssignmentEntity(), individualPlayerEntity);
+                            }
                         }
                     }
-                }
-                else { //PlayerType.Individual
-                    if (ruleEntity.getAchievementAssignmentEntity().getAssessmentLevel().equals(PlayerType.Individual)) {
-                        loggedAchievementService.createLoggedAchievementEntity(Date.valueOf(timestamp.toLocalDateTime().toLocalDate()), ruleEntity.getAchievementAssignmentEntity(), playerEntity);
+                    else { //PlayerType.Individual
+                        if (ruleEntity.getAchievementAssignmentEntity().getAssessmentLevel().equals(PlayerType.Individual)) {
+                            loggedAchievementService.createLoggedAchievementEntity(Date.valueOf(timestamp.toLocalDateTime().toLocalDate()), ruleEntity.getAchievementAssignmentEntity(), playerEntity);
+                        }
+                        else { //PlayerType.Team
+                            IndividualPlayerEntity individualPlayerEntity = (IndividualPlayerEntity) playerEntity;
+                            loggedAchievementService.createLoggedAchievementEntity(Date.valueOf(timestamp.toLocalDateTime().toLocalDate()), ruleEntity.getAchievementAssignmentEntity(), individualPlayerEntity.getTeamPlayerEntity());
+                        }
                     }
-                    else { //PlayerType.Team
-                        IndividualPlayerEntity individualPlayerEntity = (IndividualPlayerEntity) playerEntity;
-                        loggedAchievementService.createLoggedAchievementEntity(Date.valueOf(timestamp.toLocalDateTime().toLocalDate()), ruleEntity.getAchievementAssignmentEntity(), individualPlayerEntity.getTeamPlayerEntity());
+                    if (ruleEntity.getAchievementAssignmentEntity().getAchievementEntity().getCategory().equals(AchievementCategoryType.Points)) {
+                        playerEntity.setPoints(playerEntity.getPoints() + ruleEntity.getAchievementAssignmentEntity().getAchievementUnits());
+                        playerEntity.setLevel(ruleEntity.getGameEntity().calculateLevel(playerEntity.getPoints()));
                     }
-                }
-                if (ruleEntity.getAchievementAssignmentEntity().getAchievementEntity().getCategory().equals(AchievementCategoryType.Points)) {
-                    playerEntity.setPoints(playerEntity.getPoints() + ruleEntity.getAchievementAssignmentEntity().getAchievementUnits());
-                    playerEntity.setLevel(ruleEntity.getGameEntity().calculateLevel(playerEntity.getPoints()));
                 }
             }
+        } catch (Exception e) {
+            logger.error("❌ Error dins evaluateRule per player: {} acció: {} - {}", playerEntity.getPlayername(), ruleEntity.getEvaluableActionEntity().getId(), e.getMessage(), e);
+            throw e; 
         }
     }
 
@@ -164,18 +181,23 @@ public class GameServiceImpl implements GameService {
         for (RuleEntity ruleEntity : gameEntity.getRuleEntities()) {
             try {
                 if (ruleEntity.checkRuleValidity(Date.valueOf(timestamp.toLocalDateTime().toLocalDate()))) {
+                    PlayerType level = ruleEntity.getEvaluableActionEntity().getAssessmentLevel();
+                    logger.info("Evaluating rule: {} for level: {}", ruleEntity.getEvaluableActionEntity().getId(), level);
+                    
                     if (ruleEntity.getEvaluableActionEntity().getAssessmentLevel().equals(PlayerType.Team)) {
                         for (PlayerEntity playerEntity : teamPlayerEntities) {
+                            logger.info("Evaluating team player: {}", playerEntity.getPlayername());
                             evaluateRule(ruleEntity, playerEntity, timestamp);
                         }
                     } else { //PlayerType.Individual
                         for (PlayerEntity playerEntity : individualPlayerEntities) {
+                            logger.info("Evaluating individual player: {}", playerEntity.getPlayername());
                             evaluateRule(ruleEntity, playerEntity, timestamp);
                         }
                     }
                 }
             } catch (Exception e) {
-                System.err.println("Error evaluationg rule with evaluable action: " + ruleEntity.getEvaluableActionEntity().getId()
+                System.err.println("Error evaluating rule with evaluable action: " + ruleEntity.getEvaluableActionEntity().getId()
                         + ". Make sure when using rules with strategic indicators or quality factors that these are defined for all teams on the LD.");
             }
         }

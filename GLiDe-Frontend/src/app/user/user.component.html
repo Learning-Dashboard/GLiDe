@@ -3,28 +3,24 @@
     <mat-card-title>Select User</mat-card-title>
   </mat-card-header>
   <mat-card-content class="card-content">
-    <mat-radio-group [(ngModel)]="selectedPlayer" (ngModelChange)="onSubmit()" *ngIf="players && teams">
-      <div *ngFor="let res of result; let i = index" class="row">
-        <div class="col">
-          <mat-radio-button color="primary" [value]="res.playername">
-            <div class="radio-content">
-              <img mat-card-avatar [src]="players[i].avatar" alt="avatar" class="avatar">
-              <span class="name">{{ res.playername }}</span>
-              <div class="details">
-                <span class="level">Level: {{ players[i].level }}</span>
-                <span class="points">Points: {{ players[i].points }}</span>
-              </div>
-              <img mat-card-avatar [src]="teams[i].logo" alt="logo" class="avatar">
-              <span class="team-name">{{ teams[i].playername }}</span>
-              <div class="details">
-                <span class="team-level">Team Level: {{ teams[i].level }}</span>
-                <span class="team-points">Team Points: {{ teams[i].points }}</span>
-              </div>
-            </div>
-          </mat-radio-button>
+    <mat-radio-group [(ngModel)]="selectedPlayer" (ngModelChange)="onPlayerSelected($event)" *ngIf="players && teams">
+      <mat-radio-button class="player-card" *ngFor="let res of result; let i = index" [value]="res.playername">
+        <div class="radio-content">
+          <img mat-card-avatar [src]="players[i].avatar" alt="avatar" class="avatar">
+          <span class="name">{{ res.playername }}</span>
+          <div class="details">
+            <span class="level">Level: {{ players[i].level }}</span>
+            <span class="points">Points: {{ players[i].points }}</span>
+          </div>
+          <img mat-card-avatar [src]="teams[i].logo" alt="logo" class="avatar">
+          <span class="team-name">{{ teams[i].playername }}</span>
+          <div class="details">
+            <span class="team-level">Team Level: {{ teams[i].level }}</span>
+            <span class="team-points">Team Points: {{ teams[i].points }}</span>
+          </div>
         </div>
-      </div>
-    </mat-radio-group>
+      </mat-radio-button>
+    </mat-radio-group>    
   </mat-card-content>
   <div class="button-div">
     <button mat-raised-button color="primary" (click)="logOut()">Log out</button>
