@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +62,7 @@ public class GameServiceImpl implements GameService {
                     logger.info("AchievementEntity: {}", ruleEntity.getAchievementAssignmentEntity().getAchievementEntity().getId());
                     if (playerEntity.getType().equals(PlayerType.Team)) {
                         if (ruleEntity.getAchievementAssignmentEntity().getAssessmentLevel().equals(PlayerType.Team)) {
+                            
                             loggedAchievementService.createLoggedAchievementEntity(Date.valueOf(timestamp.toLocalDateTime().toLocalDate()), ruleEntity.getAchievementAssignmentEntity(), playerEntity);
                         }
                         else { //PlayerType.Individual
@@ -154,7 +156,7 @@ public class GameServiceImpl implements GameService {
 
     @Override
     @Transactional
-    public void evaluateGame(String gameSubjectAcronym, Integer gameCourse, String gamePeriod) {
+    public void evaluateGame(String gameSubjectAcronym, Integer gameCourse, String gamePeriod, LocalDate evaluationDate) {
         PeriodType gamePeriodType = PeriodType.fromString(gamePeriod);
         GameKey gameKey = new GameKey();
         gameKey.setSubjectAcronym(gameSubjectAcronym);
@@ -166,7 +168,7 @@ public class GameServiceImpl implements GameService {
             throw new ConstraintViolationException("Game cannot be evaluated because its state is '" + gameEntity.getState().toString() + "' and not 'Playing', please try again only inside date range [" + gameEntity.getStartDate() + "," + gameEntity.getEndDate() + "].");
         }
 
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        Timestamp timestamp = Timestamp.valueOf(evaluationDate.atStartOfDay());
 
         List<PlayerEntity> teamPlayerEntities = new ArrayList<>();
         List<PlayerEntity> individualPlayerEntities = new ArrayList<>();

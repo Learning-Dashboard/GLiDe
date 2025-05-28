@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -123,7 +124,7 @@ public class GameServiceUnitTests {
         when(gameRepository.findById(gameKey)).thenReturn(Optional.empty());
 
         ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> {
-            gameService.evaluateGame("SUBJECT1", 2024, "Quadrimester2");
+            gameService.evaluateGame("SUBJECT1", 2024, "Quadrimester2", LocalDate.now());
         });
 
         assertEquals("Game with subject acronym 'SUBJECT1', course '2024' and period 'Quadrimester2' not found.", exception.getMessage());

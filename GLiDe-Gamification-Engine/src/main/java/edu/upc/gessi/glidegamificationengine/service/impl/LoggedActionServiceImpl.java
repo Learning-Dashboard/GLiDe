@@ -10,6 +10,7 @@ import edu.upc.gessi.glidegamificationengine.type.PlayerType;
 import edu.upc.gessi.glidegamificationengine.type.SourceDataToolType;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -47,6 +48,7 @@ public class LoggedActionServiceImpl implements LoggedActionService {
 
         if (evaluableActionEntity.getSourceDataTool().equals(SourceDataToolType.LearningDashboard)) {
             sourceDataAPIURL = learningdashboardAPIBaseURL + evaluableActionEntity.getSourceDataAPIEndpoint();
+            System.out.println("Calling LearningDashboard API URL: " + sourceDataAPIURL);
             if (evaluableActionEntity.getAssessmentLevel().equals(PlayerType.Team)) {
                 TeamPlayerEntity teamPlayerEntity = (TeamPlayerEntity) playerEntity;
                 sourceDataAPIURL = sourceDataAPIURL.replaceFirst("\\*", evaluableActionEntity.getName());
@@ -58,7 +60,15 @@ public class LoggedActionServiceImpl implements LoggedActionService {
                 else sourceDataAPIURL = sourceDataAPIURL.replaceFirst("\\*", evaluableActionEntity.getName() + "_" + individualPlayerEntity.getStudentUserEntity().getGithubUsername());
                 sourceDataAPIURL = sourceDataAPIURL.replaceFirst("\\*", individualPlayerEntity.getTeamPlayerEntity().getProjectEntity().getLearningdashboardIdentifier());
             }
+            String dateStr = timestamp.toLocalDateTime().toLocalDate().toString();
+            if (sourceDataAPIURL.contains("?")) {
+                sourceDataAPIURL += "&from=" + dateStr + "&to=" + dateStr;
+            } else {
+                sourceDataAPIURL += "?from=" + dateStr + "&to=" + dateStr;
+            }
+
             sourceDataAPIKey = learningdashboardAPIKey;
+            System.out.println("LearningDashboard API URL: " + sourceDataAPIURL);
         }
 
         String jsonString = webClient.get()
@@ -67,7 +77,17 @@ public class LoggedActionServiceImpl implements LoggedActionService {
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
-        JSONObject jsonObject = new JSONObject(jsonString);
+        JSONObject jsonObject;
+        if (jsonString.trim().startsWith("[")) {
+            JSONArray jsonArray = new JSONArray(jsonString);
+            if (jsonArray.isEmpty()) {
+                throw new IllegalArgumentException("No data returned from LD for the selected date.");
+            }
+            jsonObject = jsonArray.getJSONObject(0);
+        } 
+        else {
+            jsonObject = new JSONObject(jsonString);
+        }
 
         LoggedActionEntity loggedActionEntity = null;
 

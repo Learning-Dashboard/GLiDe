@@ -20,6 +20,9 @@ import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatOption} from "@angular/material/autocomplete";
 import {MatSelect} from "@angular/material/select";
 import {FormsModule} from "@angular/forms";
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatInputModule } from '@angular/material/input';
 
 class Badge {
   name: string | undefined;
@@ -49,6 +52,9 @@ let globalNotAttainedBadges: Badge[] = [];
     MatExpansionPanelDescription,
     MatExpansionModule,
     MatDivider,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatInputModule,
     MatTooltip,
     LeaderboardComponent,
     RankingComponent,
@@ -79,6 +85,8 @@ export class TeamgamificationComponent {
   private gameSubjectAcronym: any;
   private gameCourse: any;
   private gamePeriod: any;
+  
+  public selectedDate: Date | null = null;
 
   constructor(private service: LearningdashboardService, private sanitizer: DomSanitizer, public dialog: MatDialog) {}
 
@@ -150,7 +158,40 @@ export class TeamgamificationComponent {
     dialogRef.afterClosed().subscribe(result => {
     });
   }
+
+  public evaluateGame(): void {
+    if (!this.gameSubjectAcronym || !this.gameCourse || !this.gamePeriod) {
+      alert('Falten dades per fer l\'avaluació del Game.');
+      return;
+    }
+
+    const course = parseInt(this.gameCourse, 10);
+    if (isNaN(course)) {
+      alert('El valor de "course" no és vàlid.');
+      return;
+    }
+
+    let formattedDate: string | undefined = undefined;
+    if (this.selectedDate) {
+      const year = this.selectedDate.getFullYear();
+      const month = String(this.selectedDate.getMonth() + 1).padStart(2, '0');
+      const day = String(this.selectedDate.getDate()).padStart(2, '0');
+      formattedDate = `${year}-${month}-${day}`; // format: YYYY-MM-DD
+    }
+    
+    this.service.evaluateGame(this.gameSubjectAcronym, course, this.gamePeriod, formattedDate).subscribe({
+      next: (res) => {
+        console.log('Resultat de l\'avaluació:', res);
+        alert('Avaluació completada correctament.');
+      },
+      error: (err) => {
+        console.error('Error durant l\'avaluació:', err);
+        alert('Error durant l\'avaluació.');
+      }
+    });
+  }
 }
+
 
 @Component({
   selector: 'dialog-content-achieved-dialog',

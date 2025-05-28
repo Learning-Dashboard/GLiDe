@@ -8,11 +8,13 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.sql.Date;
 import java.util.List;
@@ -48,9 +50,14 @@ public class GameController {
     @GetMapping(value ="/evaluate", produces = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity<String> evaluateGame(@RequestParam(value = "subjectAcronym") String gameSubjectAcronym,
                                                @RequestParam(value = "course") Integer gameCourse,
-                                               @RequestParam(value = "period") String gamePeriod) {
-        gameService.evaluateGame(gameSubjectAcronym, gameCourse, gamePeriod);
-        return ResponseEntity.ok("Game corresponding to subject with acronym '" + gameSubjectAcronym + "', course '" + gameCourse + "' and period '" + gamePeriod + "' successfully evaluated.");
+                                               @RequestParam(value = "period") String gamePeriod,
+                                               @RequestParam(required = false)
+                                               @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate evaluationDate) {
+        if (evaluationDate == null) {
+            evaluationDate = LocalDate.now();
+        }
+        gameService.evaluateGame(gameSubjectAcronym, gameCourse, gamePeriod, evaluationDate);
+        return ResponseEntity.ok("Game corresponding to subject with acronym '" + gameSubjectAcronym + "', course '" + gameCourse + "' period '" + gamePeriod + "', and date '" + evaluationDate + "' successfully evaluated.");
     }
 
     @Operation(summary = "Create game", description = "Create new game from given parameters.", tags = { "games" })

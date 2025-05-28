@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
+import { Observable } from 'rxjs/internal/Observable';
 
 @Injectable({
   providedIn: 'root'
@@ -117,4 +118,21 @@ export class LearningdashboardService {
   getEvaluableActions(){
     return this.http.get(this.backUrl + '/gamification/evaluableActions');
   }
+
+  evaluateGame(subjectAcronym: string, course: number, period: string, evaluationDate?: string): Observable<string> {
+    let params = new HttpParams()
+      .set('subjectAcronym', subjectAcronym)
+      .set('course', course.toString())
+      .set('period', period);
+
+    if (evaluationDate) {
+      params = params.set('evaluationDate', evaluationDate);
+    }
+
+    return this.http.get('http://localhost:8081/api/games/evaluate', {
+      params: params,
+      responseType: 'text'
+    });
+  }
+
 }
