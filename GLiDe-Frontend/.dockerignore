@@ -1,0 +1,8 @@
+# GLiDe-Frontend/.dockerignore
+node_modules
+.git
+dist
+.angular
+coverage
+*.log
+.env
