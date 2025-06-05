@@ -15,5 +15,4 @@ public class TeacherUserDto {
     private String email;
     private String name;
     private String surname;
-    private List<TeacherGameDto> teacherGames;
 }

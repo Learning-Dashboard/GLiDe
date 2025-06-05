@@ -1,58 +1,94 @@
 package edu.upc.gessi.glidebackend.controller;
 
-import edu.upc.gessi.glidebackend.dto.TeacherGameDto;
 import edu.upc.gessi.glidebackend.dto.TeacherUserDto;
+import edu.upc.gessi.glidebackend.dto.TeacherGameDto;
 import edu.upc.gessi.glidebackend.service.TeacherService;
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@AllArgsConstructor
 @RestController
 @RequestMapping("/api/teachers")
-@CrossOrigin(origins = "http://localhost:4201")
+@CrossOrigin(origins = "http://localhost:4202")
 public class TeacherController {
 
+    @Autowired
     private TeacherService teacherService;
 
+    // GET /api/teachers - Obtenir tots els professors
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<TeacherUserDto>> getAllTeachers() {
+        List<TeacherUserDto> teachers = teacherService.getAllTeachers();
+        return ResponseEntity.ok(teachers);
+    }
+
+    // GET /api/teachers/{email} - Obtenir un professor específic
+    @GetMapping(value = "/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<TeacherUserDto> getTeacher(@PathVariable String email) {
+        TeacherUserDto teacher = teacherService.getTeacher(email);
+        return ResponseEntity.ok(teacher);
+    }
+
+    // POST /api/teachers - Crear un nou professor
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<TeacherUserDto> createTeacher(@RequestBody TeacherUserDto teacherDto) {
+        TeacherUserDto created = teacherService.createTeacher(teacherDto);
+        return ResponseEntity.ok(created);
+    }
+
+    // PUT /api/teachers/{email} - Actualitzar un professor
+    @PutMapping(value = "/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<TeacherUserDto> updateTeacher(@PathVariable String email, @RequestBody TeacherUserDto teacherDto) {
+        TeacherUserDto updated = teacherService.updateTeacher(email, teacherDto);
+        return ResponseEntity.ok(updated);
+    }
+
+    // DELETE /api/teachers/{email} - Eliminar un professor
+    @DeleteMapping("/{email}")
+    public ResponseEntity<Void> deleteTeacher(@PathVariable String email) {
+        teacherService.deleteTeacher(email);
+        return ResponseEntity.ok().build();
+    }
+
+    // GET /api/teachers/{teacherEmail}/games - Obtenir games d'un professor
     @GetMapping(value = "/{teacherEmail}/games", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<TeacherGameDto>> getTeacherGames(@PathVariable("teacherEmail") String teacherEmail) {
+    public ResponseEntity<List<TeacherGameDto>> getTeacherGames(@PathVariable String teacherEmail) {
         List<TeacherGameDto> games = teacherService.getTeacherGames(teacherEmail);
         return ResponseEntity.ok(games);
     }
 
-    @PostMapping(value = "/{teacherEmail}/games", produces = MediaType.APPLICATION_JSON_VALUE)
+    // POST /api/teachers/{teacherEmail}/games - Assignar game a professor
+    @PostMapping(value = "/{teacherEmail}/games")
     public ResponseEntity<TeacherGameDto> assignGameToTeacher(
-            @PathVariable("teacherEmail") String teacherEmail,
-            @RequestParam("gameSubjectAcronym") String gameSubjectAcronym,
-            @RequestParam("gameCourse") Integer gameCourse,
-            @RequestParam("gamePeriod") String gamePeriod) {
-        
+            @PathVariable String teacherEmail,
+            @RequestParam String gameSubjectAcronym,
+            @RequestParam Integer gameCourse,
+            @RequestParam String gamePeriod) {
         TeacherGameDto assigned = teacherService.assignGameToTeacher(teacherEmail, gameSubjectAcronym, gameCourse, gamePeriod);
         return ResponseEntity.ok(assigned);
     }
 
-    @DeleteMapping(value = "/{teacherEmail}/games")
+    // DELETE /api/teachers/{teacherEmail}/games - Desassignar game de professor
+    @DeleteMapping("/{teacherEmail}/games")
     public ResponseEntity<Void> removeGameFromTeacher(
-            @PathVariable("teacherEmail") String teacherEmail,
-            @RequestParam("gameSubjectAcronym") String gameSubjectAcronym,
-            @RequestParam("gameCourse") Integer gameCourse,
-            @RequestParam("gamePeriod") String gamePeriod) {
-        
+            @PathVariable String teacherEmail,
+            @RequestParam String gameSubjectAcronym,
+            @RequestParam Integer gameCourse,
+            @RequestParam String gamePeriod) {
         teacherService.removeGameFromTeacher(teacherEmail, gameSubjectAcronym, gameCourse, gamePeriod);
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping(value = "/games/{gameSubjectAcronym}/{gameCourse}/{gamePeriod}/teachers", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<TeacherUserDto>> getTeachersForGame(
-            @PathVariable("gameSubjectAcronym") String gameSubjectAcronym,
-            @PathVariable("gameCourse") Integer gameCourse,
-            @PathVariable("gamePeriod") String gamePeriod) {
-        
-        List<TeacherUserDto> teachers = teacherService.getTeachersForGame(gameSubjectAcronym, gameCourse, gamePeriod);
+    // GET /api/teachers/games - Obtenir professors d'un game específic
+    @GetMapping(value = "/games", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<TeacherGameDto>> getTeachersForGame(
+            @RequestParam String gameSubjectAcronym,
+            @RequestParam Integer gameCourse,
+            @RequestParam String gamePeriod) {
+        List<TeacherGameDto> teachers = teacherService.getTeachersForGame(gameSubjectAcronym, gameCourse, gamePeriod);
         return ResponseEntity.ok(teachers);
     }
 }

@@ -1,0 +1,39 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-container">
+  <mat-card class="card">
+    <mat-card-header>
+      <mat-card-title>Teacher Creation</mat-card-title>
+    </mat-card-header>
+    <mat-card-content class="card-content">
+      <mat-form-field class="full-width">
+        <mat-label>Email</mat-label>
+        <input matInput formControlName="email" required type="email">
+        <mat-error *ngIf="form.get('email')?.hasError('required')">Email is required</mat-error>
+        <mat-error *ngIf="form.get('email')?.hasError('email')">Please enter a valid email</mat-error>
+      </mat-form-field>
+
+      <mat-form-field class="full-width">
+        <mat-label>Name</mat-label>
+        <input matInput formControlName="name" required>
+        <mat-error *ngIf="form.get('name')?.hasError('required')">Name is required</mat-error>
+        <mat-error *ngIf="form.get('name')?.hasError('minlength')">Name must be at least 2 characters</mat-error>
+      </mat-form-field>
+
+      <mat-form-field class="full-width">
+        <mat-label>Surname</mat-label>
+        <input matInput formControlName="surname" required>
+        <mat-error *ngIf="form.get('surname')?.hasError('required')">Surname is required</mat-error>
+        <mat-error *ngIf="form.get('surname')?.hasError('minlength')">Surname must be at least 2 characters</mat-error>
+      </mat-form-field>      
+      <mat-form-field class="full-width">
+        <mat-label>Assign to Games (optional)</mat-label>
+        <mat-select formControlName="games" multiple>
+          <mat-option *ngFor="let game of games" [value]="game">
+            {{game.subjectAcronym}} {{game.course}}/{{game.course + 1}} {{game.period}}
+          </mat-option>
+        </mat-select>
+        <mat-hint>Select one or more games to optionally assign this teacher</mat-hint>
+      </mat-form-field>
+    </mat-card-content>
+  </mat-card>
+  <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">Submit</button>
+</form>

@@ -1,0 +1,90 @@
+<div *ngIf="!game" class="alert alert-warning">
+  <i class="fas fa-exclamation-triangle"></i> Please select a game first to manage teachers.
+</div>
+
+<div *ngIf="game">
+  <mat-card class="card">
+    <mat-card-title class="card-title">
+      Teachers for {{ game.subjectAcronym }} - Course {{ game.course }}/{{ game.course + 1 }} - {{ game.period }}
+    </mat-card-title>
+    
+    <mat-card-content class="card-content">
+      <div *ngIf="error" class="alert alert-danger mb-3">
+        <i class="fas fa-exclamation-circle"></i> {{ error }}
+      </div>
+
+      <div class="row">
+        <!-- Assigned Teachers -->
+        <div class="col-md-6">
+          <mat-card class="inner-card">
+            <mat-card-header>
+              <mat-card-title>
+                <i class="fas fa-users"></i> Assigned Teachers 
+                <span class="badge bg-primary ms-2">{{ assignedTeachers.length }}</span>
+              </mat-card-title>
+            </mat-card-header>
+            
+            <mat-card-content>
+              <div *ngIf="loading" class="text-center p-3">
+                <mat-spinner diameter="40"></mat-spinner>
+              </div>
+              
+              <div *ngIf="assignedTeachers.length === 0 && !loading" class="text-center text-muted p-3">
+                <i class="fas fa-user-slash fa-2x mb-2"></i>
+                <p>No teachers assigned to this game</p>
+              </div>
+
+              <mat-list *ngIf="assignedTeachers.length > 0">
+                <mat-list-item *ngFor="let teacherGame of assignedTeachers" class="teacher-item">
+                  <div matListItemTitle>{{ getTeacherName(teacherGame.teacherEmail) }}</div>
+                  <div matListItemLine>{{ teacherGame.teacherEmail }}</div>
+                  <button mat-icon-button color="warn" 
+                          (click)="removeTeacher(teacherGame.teacherEmail)"
+                          matListItemMeta>
+                    <mat-icon>remove_circle</mat-icon>
+                  </button>
+                </mat-list-item>
+              </mat-list>
+            </mat-card-content>
+          </mat-card>
+        </div>
+
+        <!-- Available Teachers -->
+        <div class="col-md-6">
+          <mat-card class="inner-card">
+            <mat-card-header>
+              <mat-card-title>
+                <i class="fas fa-user-plus"></i> Available Teachers
+              </mat-card-title>
+            </mat-card-header>
+              <!-- Available Teachers List -->
+              <div *ngIf="availableTeachers.length === 0 && !loading && !showNewTeacherForm" 
+                   class="text-center text-muted p-3">
+                <i class="fas fa-check-circle fa-2x mb-2"></i>
+                <p>All teachers are already assigned</p>
+              </div>
+
+              <mat-list *ngIf="availableTeachers.length > 0">
+                <mat-list-item *ngFor="let teacher of availableTeachers" class="teacher-item">
+                  <div matListItemTitle>{{ teacher.name }} {{ teacher.surname }}</div>
+                  <div matListItemLine>{{ teacher.email }}</div>
+                  <div matListItemMeta class="teacher-actions">
+                    <button mat-icon-button color="primary" 
+                            (click)="assignTeacher(teacher.email)"
+                            matTooltip="Assign to game">
+                      <mat-icon>add_circle</mat-icon>
+                    </button>
+                    <button mat-icon-button color="warn" 
+                            (click)="deleteTeacher(teacher.email)"
+                            matTooltip="Delete teacher">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </mat-list-item>
+              </mat-list>
+          </mat-card>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

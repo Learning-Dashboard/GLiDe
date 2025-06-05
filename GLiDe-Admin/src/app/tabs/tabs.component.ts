@@ -5,6 +5,7 @@ import {AchievementCreationComponent} from '../achievement-creation/achievement-
 import {RuleCreationComponent} from '../rule-creation/rule-creation.component';
 import {LeaderboardCreationComponent} from '../leaderboard-creation/leaderboard-creation.component';
 import {GameTabsComponent} from '../game-tabs/game-tabs.component';
+import { TeacherCreationComponent } from '../teacher-creation/teacher-creation.component';
 
 @Component({
   selector: 'app-tabs',
@@ -14,7 +15,8 @@ import {GameTabsComponent} from '../game-tabs/game-tabs.component';
     AchievementCreationComponent,
     RuleCreationComponent,
     LeaderboardCreationComponent,
-    GameTabsComponent
+    GameTabsComponent,
+    TeacherCreationComponent
   ],
   templateUrl: './tabs.component.html',
   standalone: true,

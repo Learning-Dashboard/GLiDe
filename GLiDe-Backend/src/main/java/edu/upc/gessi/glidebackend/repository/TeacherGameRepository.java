@@ -5,15 +5,21 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface TeacherGameRepository extends JpaRepository<TeacherGameEntity, Long> {
     
-    List<TeacherGameEntity> findByTeacherUserEntityEmail(String teacherEmail);
+    List<TeacherGameEntity> findByTeacherUserEntity_Email(String teacherEmail);
     
     List<TeacherGameEntity> findByGameSubjectAcronymAndGameCourseAndGamePeriod(
-        String gameSubjectAcronym, Integer gameCourse, String gamePeriod);
+            String gameSubjectAcronym, Integer gameCourse, String gamePeriod);
     
-    boolean existsByTeacherUserEntityEmailAndGameSubjectAcronymAndGameCourseAndGamePeriod(
-        String teacherEmail, String gameSubjectAcronym, Integer gameCourse, String gamePeriod);
+    Optional<TeacherGameEntity> findByTeacherUserEntity_EmailAndGameSubjectAcronymAndGameCourseAndGamePeriod(
+            String teacherEmail, String gameSubjectAcronym, Integer gameCourse, String gamePeriod);
+    
+    boolean existsByTeacherUserEntity_EmailAndGameSubjectAcronymAndGameCourseAndGamePeriod(
+            String teacherEmail, String gameSubjectAcronym, Integer gameCourse, String gamePeriod);
+    
+    void deleteByTeacherUserEntity_Email(String teacherEmail);
 }

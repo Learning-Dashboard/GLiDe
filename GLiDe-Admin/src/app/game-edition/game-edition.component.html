@@ -92,6 +92,14 @@
           </mat-card>
           <div>
             <button mat-button matStepperPrevious color="primary">Back</button>
+            <button mat-button matStepperNext color="primary">Next</button>
+          </div>
+        </mat-step>
+        <mat-step label="Teachers">
+          <app-teacher-edition [game]="game">
+          </app-teacher-edition>
+          <div>
+            <button mat-button matStepperPrevious color="primary">Back</button>
           </div>
         </mat-step>
       </mat-stepper>

@@ -7,6 +7,7 @@ import {MatSelect} from '@angular/material/select';
 import {NgForOf, NgIf} from '@angular/common';
 import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {GamificationEngineService} from '../services/gamification-engine.service';
+import {TeacherService} from '../services/teachers.service';
 import {
   MatDatepickerToggle,
   MatDateRangeInput,
@@ -19,12 +20,13 @@ import {MatListModule} from '@angular/material/list';
 import {MatIcon} from '@angular/material/icon';
 import {LeaderboardEditionComponent} from '../leaderboard-edition/leaderboard-edition.component';
 import {RuleEditionComponent} from '../rule-edition/rule-edition.component';
+import {TeacherEditionComponent} from '../teacher-edition/teacher-edition.component';
 import {catchError, of, switchMap} from 'rxjs';
 import {DateFormatService} from '../services/date-format.service';
 
 @Component({
   selector: 'app-game-edition',
-  imports: [MatCardModule, MatStepperModule, MatFormField, MatLabel, MatOption, MatSelect, NgForOf, ReactiveFormsModule, MatDateRangeInput, MatDateRangePicker, MatDatepickerToggle, MatEndDate, MatHint, MatStartDate, MatSuffix, MatButton, MatListModule, NgIf, MatIcon, MatMiniFabButton, LeaderboardEditionComponent, RuleEditionComponent],
+  imports: [MatCardModule, MatStepperModule, MatFormField, MatLabel, MatOption, MatSelect, NgForOf, ReactiveFormsModule, MatDateRangeInput, MatDateRangePicker, MatDatepickerToggle, MatEndDate, MatHint, MatStartDate, MatSuffix, MatButton, MatListModule, NgIf, MatIcon, MatMiniFabButton, LeaderboardEditionComponent, RuleEditionComponent, TeacherEditionComponent],
   providers: [provideNativeDateAdapter(), [{provide: MAT_DATE_LOCALE, useValue: 'en-GB'}]],
   templateUrl: './game-edition.component.html',
   styleUrl: './game-edition.component.css'
@@ -36,10 +38,11 @@ export class GameEditionComponent {
   dateRules: any;
   leaderboards: any;
   achievements: any;
+  teachers: any;
   selectedFile: any;
   evaluableActions: any;
 
-  constructor(private service: GamificationEngineService, private dateService: DateFormatService) {}
+  constructor(private service: GamificationEngineService, private dateService: DateFormatService, private teachersService: TeacherService) {}
 
   gameForm: FormGroup = new FormGroup({
     game: new FormControl,
@@ -74,6 +77,10 @@ export class GameEditionComponent {
     });
     this.service.getLeaderboards(this.game.subjectAcronym, this.game.course, this.game.period).subscribe((result) => {
       this.leaderboards = result;
+    });
+
+    this.teachersService.getTeachersForGame(this.game.subjectAcronym, this.game.course, this.game.period).subscribe((result) => {
+      this.teachers = result;
     });
   }
 
