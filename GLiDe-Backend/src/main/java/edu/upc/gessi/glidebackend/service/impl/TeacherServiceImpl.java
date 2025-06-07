@@ -35,8 +35,11 @@ public class TeacherServiceImpl implements TeacherService {
     @Transactional
     public TeacherUserDto getTeacher(String idToken) {
         String email = authService.getTokenMail(idToken);
+        System.out.println("Email from token: " + email);
+        System.out.println("Buscant professor amb email exactament: [" + email + "]");
         TeacherUserEntity teacherUserEntity = teacherUserRepository.findById(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Teacher not found"));
+        System.out.println("Teacher User Entity: " + teacherUserEntity);
         return modelMapper.map(teacherUserEntity, TeacherUserDto.class);
     }
 

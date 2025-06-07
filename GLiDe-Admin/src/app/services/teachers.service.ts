@@ -61,6 +61,6 @@ export class TeacherService {
 
   getTeachersForGame(gameSubjectAcronym: string, gameCourse: number, gamePeriod: string): Observable<TeacherGame[]> {
     const params = { gameSubjectAcronym, gameCourse: gameCourse.toString(), gamePeriod };
-    return this.http.get<TeacherGame[]>(`${this.apiUrl}/games`, { params });
+    return this.http.get<TeacherGame[]>(`${this.apiUrl}/games/search`, { params });
   }
 }

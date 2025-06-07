@@ -26,6 +26,9 @@ export class TeacherService {
   constructor(private http: HttpClient) {}
 
   getTeacherProfile(idToken: string): Observable<any> {
+    if (!idToken) {
+      throw new Error('idToken is required for Authorization header');
+    }
     const headers = new HttpHeaders().set('Authorization', `Bearer ${idToken}`);
     return this.http.get(`${this.baseUrl}/teachers/profile`, { headers });
   }

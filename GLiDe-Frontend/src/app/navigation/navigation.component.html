@@ -2,7 +2,7 @@
   <mat-sidenav #drawer class="sidenav" fixedInViewport
       [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
       [mode]="(isHandset$ | async) ? 'over' : 'side'"
-      [opened]="(isHandset$ | async) === false">
+      [opened]="(isHandset$ | async) === false && !isTeacher()">
     <mat-toolbar>Menu</mat-toolbar>
     <mat-nav-list>
       <a *ngFor="let item of menuItems" mat-list-item [href]="'/' + item"> {{item | titlecase}} </a>
@@ -10,7 +10,7 @@
   </mat-sidenav>
   <mat-sidenav-content>
     <mat-toolbar color="primary">
-      @if (isHandset$ | async) {
+      @if ((isHandset$ | async) && !isTeacher()) {
         <button
           type="button"
           aria-label="Toggle sidenav"

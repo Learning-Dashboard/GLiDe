@@ -38,4 +38,8 @@ export class NavigationComponent {
       map(result => result.matches),
       shareReplay()
     );
+
+  isTeacher(): boolean {
+    return localStorage.getItem('userType') === 'teacher';
+  }
 }

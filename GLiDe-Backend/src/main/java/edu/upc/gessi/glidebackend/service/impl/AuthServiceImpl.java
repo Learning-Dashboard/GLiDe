@@ -27,22 +27,30 @@ public class AuthServiceImpl implements AuthService {
 
         HttpTransport transport = new NetHttpTransport();
         JsonFactory jsonFactory = new GsonFactory();
-
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(transport, jsonFactory)
                 .setAudience(Collections.singletonList(googleClientId))
                 .build();
 
         try {
-            GoogleIdToken googleIdToken = verifier.verify(idToken);
-            if (idToken != null) {
+            String token = idToken.startsWith("Bearer ") ? idToken.substring(7).trim() : idToken;
+            System.out.println("Stripped ID Token: " + token);
+            GoogleIdToken googleIdToken = verifier.verify(token);
+            System.out.println("Google ID Token: " + googleIdToken);
+            System.out.println("Google Client ID: " + googleClientId);
+            System.out.println("Google ID Token Audience: " + googleIdToken.getPayload().getAudience());
+            System.out.println("Google ID Token Issuer: " + googleIdToken.getPayload().getIssuer());
+            if (googleIdToken != null) {
                 Payload payload = googleIdToken.getPayload();
+                System.out.println("Payload: " + payload);
+                System.out.println("Email: " + payload.getEmail());
                 return payload.getEmail();
             } else {
-                throw new AuthorizationException("Issue verifying idToken");
+                throw new AuthorizationException("Token verification failed: Invalid ID token");
             }
         }
         catch (Exception e){
-            throw new AuthorizationException("Issue verifying idToken");
+            e.printStackTrace();
+            throw new AuthorizationException("Issue verifying idToken" + e.getMessage());
         }
     }
 }
