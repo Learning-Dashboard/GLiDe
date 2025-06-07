@@ -4,31 +4,6 @@ import { Router } from '@angular/router';
 import { TeacherService } from '../services/teacher.service';
 import { LearningdashboardService } from '../services/learningdashboard.service';
 
-interface TeacherGame {
-  id: number;
-  gameSubjectAcronym: string;
-  gameCourse: number;
-  gamePeriod: string;
-  teacherEmail: string;
-}
-
-interface Student {
-  playername: string;
-  teamPlayername: string;
-  level: number;
-  points: number;
-}
-
-interface Team {
-  teamName: string;
-  students: Student[];
-}
-
-interface GameWithStudents {
-  game: TeacherGame;
-  teams: Team[];
-}
-
 @Component({
   selector: 'app-teacher-dashboard',
   standalone: true,
@@ -36,17 +11,16 @@ interface GameWithStudents {
   templateUrl: './teacher-dashboard.component.html',
   styleUrls: ['./teacher-dashboard.component.css']
 })
-export class TeacherDashboardComponent implements OnInit {
+export class TeacherDashboardComponent {
   teacherProfile: any = null;
-  gamesWithStudents: GameWithStudents[] = [];
+  gamesWithStudents: any[] = [];
   loading = true;
   error = '';
 
   constructor(
     private teacherService: TeacherService,
     private learningdashboardService: LearningdashboardService,
-    private router: Router
-  ) {}
+    private router: Router  ) {}
 
   ngOnInit(): void {
     this.loadTeacherData();
@@ -61,54 +35,43 @@ export class TeacherDashboardComponent implements OnInit {
     }
 
     // Cargar perfil del profesor
-    this.teacherService.getTeacherProfile(idToken).subscribe({
-      next: (profile) => {
-        this.teacherProfile = profile;
-        this.loadTeacherGames(idToken);
-      },
-      error: (error) => {
-        console.error('Error loading teacher profile:', error);
-        this.error = 'Error al cargar el perfil del profesor';
-        this.loading = false;
-      }
+    this.teacherService.getTeacherProfile(idToken).subscribe((profile: any) => {
+      this.teacherProfile = profile;
+      this.loadTeacherGames(idToken);
+    }, (error: any) => {      console.error('Error loading teacher profile:', error);
+      this.error = 'Error al cargar el perfil del profesor';
+      this.loading = false;
     });
   }
 
   loadTeacherGames(idToken: string): void {
-    this.teacherService.getTeacherGames(idToken).subscribe({
-      next: (games: TeacherGame[]) => {
-        this.loadStudentsForGames(games);
-      },
-      error: (error) => {
-        console.error('Error loading teacher games:', error);
-        this.error = 'Error al cargar los games del profesor';
-        this.loading = false;
-      }
+    this.teacherService.getTeacherGames(idToken).subscribe((games: any[]) => {
+      this.loadStudentsForGames(games);
+    }, (error: any) => {      console.error('Error loading teacher games:', error);
+      this.error = 'Error al cargar los games del profesor';
+      this.loading = false;
     });
   }
 
-  loadStudentsForGames(games: TeacherGame[]): void {
+  loadStudentsForGames(games: any[]): void {
     const gamePromises = games.map(game => 
       this.teacherService.getGameStudents(game.gameSubjectAcronym, game.gameCourse, game.gamePeriod)
         .toPromise()
-        .then((students: Student[] | undefined) => {
+        .then((students: any[] | undefined) => {
           const teams = this.groupStudentsByTeam(students || []);
           return { game, teams };
-        })
-        .catch(error => {
+        })        .catch((error: any) => {
           console.error(`Error loading students for game ${game.gameSubjectAcronym}:`, error);
           return { game, teams: [] };
         })
-    );
-
-    Promise.all(gamePromises).then(gamesWithStudents => {
+    );    Promise.all(gamePromises).then((gamesWithStudents: any) => {
       this.gamesWithStudents = gamesWithStudents;
       this.loading = false;
     });
   }
 
-  groupStudentsByTeam(students: Student[]): Team[] {
-    const teamsMap = new Map<string, Student[]>();
+  groupStudentsByTeam(students: any[]): any[] {
+    const teamsMap = new Map<string, any[]>();
     
     students.forEach(student => {
       if (!teamsMap.has(student.teamPlayername)) {
@@ -120,17 +83,17 @@ export class TeacherDashboardComponent implements OnInit {
     return Array.from(teamsMap.entries()).map(([teamName, students]) => ({
       teamName,
       students
-    }));
-  }
+    }));  }
 
   viewStudentDetails(studentName: string): void {
     this.router.navigate(['/teacher-player-metrics', studentName]);
   }
-  getGameDisplayName(game: TeacherGame): string {
+
+  getGameDisplayName(game: any): string {
     return `${game.gameSubjectAcronym} - Curso ${game.gameCourse} - ${game.gamePeriod}`;
   }
 
-  getTotalStudents(teams: Team[]): number {
+  getTotalStudents(teams: any[]): number {
     return teams.reduce((total, team) => total + team.students.length, 0);
   }
 
