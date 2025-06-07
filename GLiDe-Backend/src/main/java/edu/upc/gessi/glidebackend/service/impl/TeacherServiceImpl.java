@@ -7,7 +7,7 @@ import edu.upc.gessi.glidebackend.entity.TeacherGameEntity;
 import edu.upc.gessi.glidebackend.repository.TeacherUserRepository;
 import edu.upc.gessi.glidebackend.repository.TeacherGameRepository;
 import edu.upc.gessi.glidebackend.service.TeacherService;
-import edu.upc.gessi.glidebackend.excpetion.ResourceNotFoundException;
+import edu.upc.gessi.glidebackend.exception.ResourceNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

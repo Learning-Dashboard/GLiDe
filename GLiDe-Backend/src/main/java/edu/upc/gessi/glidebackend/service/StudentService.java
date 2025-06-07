@@ -8,4 +8,5 @@ import java.util.List;
 public interface StudentService {
     StudentUserDto getStudent(String idToken);
     List<IndividualPlayerDto> getStudentPlayers(String idToken);
+    List<IndividualPlayerDto> getStudentsByGame(String subjectAcronym, Integer course, String period);
 }

@@ -18,13 +18,26 @@ import java.util.List;
 public class TeacherController {
 
     @Autowired
-    private TeacherService teacherService;
-
-    // POST /api/teachers/login - Login de profesor
+    private TeacherService teacherService;    // POST /api/teachers/login - Login de profesor
     @PostMapping(value = "/login")
     public ResponseEntity<?> postLogin(@RequestHeader(HttpHeaders.AUTHORIZATION) String idToken) {
         teacherService.getTeacher(idToken);
         return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+    // GET /api/teachers/profile - Obtenir perfil del professor autenticat
+    @GetMapping(value = "/profile", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<TeacherUserDto> getTeacherProfile(@RequestHeader(HttpHeaders.AUTHORIZATION) String idToken) {
+        TeacherUserDto teacher = teacherService.getTeacher(idToken);
+        return ResponseEntity.ok(teacher);
+    }
+
+    // GET /api/teachers/games - Obtenir games del professor autenticat
+    @GetMapping(value = "/games", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<TeacherGameDto>> getTeacherGamesAuth(@RequestHeader(HttpHeaders.AUTHORIZATION) String idToken) {
+        TeacherUserDto teacher = teacherService.getTeacher(idToken);
+        List<TeacherGameDto> games = teacherService.getTeacherGames(teacher.getEmail());
+        return ResponseEntity.ok(games);
     }
 
     // GET /api/teachers - Obtenir tots els professors
@@ -87,10 +100,8 @@ public class TeacherController {
             @RequestParam String gamePeriod) {
         teacherService.removeGameFromTeacher(teacherEmail, gameSubjectAcronym, gameCourse, gamePeriod);
         return ResponseEntity.ok().build();
-    }
-
-    // GET /api/teachers/games - Obtenir professors d'un game específic
-    @GetMapping(value = "/games", produces = MediaType.APPLICATION_JSON_VALUE)
+    }    // GET /api/teachers/games/search - Obtenir professors d'un game específic
+    @GetMapping(value = "/games/search", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<TeacherGameDto>> getTeachersForGame(
             @RequestParam String gameSubjectAcronym,
             @RequestParam Integer gameCourse,

@@ -1,4 +1,4 @@
-package edu.upc.gessi.glidebackend.excpetion;
+package edu.upc.gessi.glidebackend.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

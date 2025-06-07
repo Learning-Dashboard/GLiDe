@@ -2,7 +2,7 @@ package edu.upc.gessi.glidebackend.service.impl;
 
 import edu.upc.gessi.glidebackend.dto.*;
 import edu.upc.gessi.glidebackend.entity.*;
-import edu.upc.gessi.glidebackend.excpetion.ResourceNotFoundException;
+import edu.upc.gessi.glidebackend.exception.ResourceNotFoundException;
 import edu.upc.gessi.glidebackend.mapper.PlayerMapper;
 import edu.upc.gessi.glidebackend.mapper.PlayerMonitoringMapper;
 import edu.upc.gessi.glidebackend.mapper.StudentUserMapper;

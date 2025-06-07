@@ -24,12 +24,20 @@ public class StudentController {
     public ResponseEntity<?> postLogin(@RequestHeader(HttpHeaders.AUTHORIZATION) String idToken) {
         studentService.getStudent(idToken);
         return ResponseEntity.ok(HttpStatus.OK);
-    }
-
-    @CrossOrigin(origins = "http://localhost:4201")
+    }    @CrossOrigin(origins = "http://localhost:4201")
     @GetMapping(value="/players")
     public ResponseEntity<?> getStudentPlayers(@RequestHeader(HttpHeaders.AUTHORIZATION) String idToken) {
         List<IndividualPlayerDto> individualPlayerDto = studentService.getStudentPlayers(idToken);
         return ResponseEntity.ok(individualPlayerDto);
+    }
+
+    @CrossOrigin(origins = {"http://localhost:4201", "http://localhost:4202"})
+    @GetMapping(value="/game/{subjectAcronym}/{course}/{period}")
+    public ResponseEntity<List<IndividualPlayerDto>> getStudentsByGame(
+            @PathVariable String subjectAcronym,
+            @PathVariable Integer course,
+            @PathVariable String period) {
+        List<IndividualPlayerDto> students = studentService.getStudentsByGame(subjectAcronym, course, period);
+        return ResponseEntity.ok(students);
     }
 }

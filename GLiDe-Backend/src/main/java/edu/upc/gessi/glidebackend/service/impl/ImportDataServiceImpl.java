@@ -4,7 +4,7 @@ import edu.upc.gessi.glidebackend.entity.*;
 import edu.upc.gessi.glidebackend.repository.*;
 import edu.upc.gessi.glidebackend.service.ImportDataService;
 import edu.upc.gessi.glidebackend.type.PlayerType;
-import edu.upc.gessi.glidebackend.excpetion.ConstraintViolationException;
+import edu.upc.gessi.glidebackend.exception.ConstraintViolationException;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
