@@ -11,6 +11,7 @@ import edu.upc.gessi.glidebackend.excpetion.ResourceNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import jakarta.transaction.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,6 +28,18 @@ public class TeacherServiceImpl implements TeacherService {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private AuthServiceImpl authService;
+
+    @Override
+    @Transactional
+    public TeacherUserDto getTeacher(String idToken) {
+        String email = authService.getTokenMail(idToken);
+        TeacherUserEntity teacherUserEntity = teacherUserRepository.findById(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Teacher not found"));
+        return modelMapper.map(teacherUserEntity, TeacherUserDto.class);
+    }
+
     @Override
     public List<TeacherUserDto> getAllTeachers() {
         return teacherUserRepository.findAll().stream()
@@ -35,7 +48,7 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     @Override
-    public TeacherUserDto getTeacher(String email) {
+    public TeacherUserDto getTeacherByEmail(String email) {
         TeacherUserEntity entity = teacherUserRepository.findById(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Teacher not found with email: " + email));
         return modelMapper.map(entity, TeacherUserDto.class);

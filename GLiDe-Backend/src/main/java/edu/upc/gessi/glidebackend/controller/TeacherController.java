@@ -4,6 +4,8 @@ import edu.upc.gessi.glidebackend.dto.TeacherUserDto;
 import edu.upc.gessi.glidebackend.dto.TeacherGameDto;
 import edu.upc.gessi.glidebackend.service.TeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,23 +14,28 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/teachers")
-@CrossOrigin(origins = "http://localhost:4202")
+@CrossOrigin(origins = {"http://localhost:4201", "http://localhost:4202"})
 public class TeacherController {
 
     @Autowired
     private TeacherService teacherService;
+
+    // POST /api/teachers/login - Login de profesor
+    @PostMapping(value = "/login")
+    public ResponseEntity<?> postLogin(@RequestHeader(HttpHeaders.AUTHORIZATION) String idToken) {
+        teacherService.getTeacher(idToken);
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
 
     // GET /api/teachers - Obtenir tots els professors
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<TeacherUserDto>> getAllTeachers() {
         List<TeacherUserDto> teachers = teacherService.getAllTeachers();
         return ResponseEntity.ok(teachers);
-    }
-
-    // GET /api/teachers/{email} - Obtenir un professor específic
+    }    // GET /api/teachers/{email} - Obtenir un professor específic
     @GetMapping(value = "/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<TeacherUserDto> getTeacher(@PathVariable String email) {
-        TeacherUserDto teacher = teacherService.getTeacher(email);
+        TeacherUserDto teacher = teacherService.getTeacherByEmail(email);
         return ResponseEntity.ok(teacher);
     }
 

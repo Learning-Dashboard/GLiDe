@@ -34,19 +34,44 @@ export class LoginComponent {
 
   handleOauthResponse(response: any): void {
     const responsePayload = this.decodeJWTToken(response.credential);
-    this.service.postLogin(response.credential).subscribe((result) => {
-      if (result.status === 200){
+    const routerService = this.injector.get(Router);
+    const ngZone = this.injector.get(NgZone);
+
+    this.service.postLogin(response.credential).subscribe({
+      next: () => {
+        // 200 OK
         localStorage.setItem('loggedUser', JSON.stringify(responsePayload));
         localStorage.setItem('idToken', response.credential);
-        const routerService = this.injector.get(Router);
-        const ngZone = this.injector.get(NgZone);
-        ngZone.run(() =>{
+        localStorage.setItem('userType', 'student');
+        ngZone.run(() => {
           routerService.navigate(['/profile']);
         });
+      },
+      error: (err) => {
+        if (err.status === 404) {
+          // Intenta login com a professor
+          this.service.postTeacherLogin(response.credential).subscribe({
+            next: (teacherResult) => {
+              localStorage.setItem('loggedUser', JSON.stringify(responsePayload));
+              localStorage.setItem('idToken', response.credential);
+              localStorage.setItem('userType', 'teacher');
+              ngZone.run(() => {
+                routerService.navigate(['/teacher-dashboard']);
+              });
+            },
+            error: (teacherErr) => {
+              if (teacherErr.status === 404) {
+                this.toastr.error('The user does not exist', 'Log in failed');
+              } else if (teacherErr.status === 401) {
+                this.toastr.error('Failed to verify user', 'Log in failed');
+              }
+            }
+          });
+        } else if (err.status === 401) {
+          this.toastr.error('Failed to verify user', 'Log in failed');
+        }
       }
-      else if (result.status === 404) this.toastr.error('The user does not exist', 'Log in failed');
-      else if (result.status === 401) this.toastr.error('Failed to verify user', 'Log in failed');
-    })
+    });
   }
 
   loadGoogleScript(): Promise<void> {

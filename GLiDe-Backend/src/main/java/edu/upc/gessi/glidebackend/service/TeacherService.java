@@ -7,9 +7,12 @@ import java.util.List;
 
 public interface TeacherService {
     
+    // Autenticació
+    TeacherUserDto getTeacher(String idToken);
+    
     // Gestió de professors
     List<TeacherUserDto> getAllTeachers();
-    TeacherUserDto getTeacher(String email);
+    TeacherUserDto getTeacherByEmail(String email);
     TeacherUserDto createTeacher(TeacherUserDto teacherDto);
     TeacherUserDto updateTeacher(String email, TeacherUserDto teacherDto);
     void deleteTeacher(String email);
