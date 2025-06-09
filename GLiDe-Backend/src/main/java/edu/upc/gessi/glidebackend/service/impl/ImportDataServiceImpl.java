@@ -4,6 +4,7 @@ import edu.upc.gessi.glidebackend.entity.*;
 import edu.upc.gessi.glidebackend.repository.*;
 import edu.upc.gessi.glidebackend.service.ImportDataService;
 import edu.upc.gessi.glidebackend.type.PlayerType;
+import edu.upc.gessi.glidebackend.type.PeriodType;
 import edu.upc.gessi.glidebackend.exception.ConstraintViolationException;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -104,7 +105,7 @@ public class ImportDataServiceImpl implements ImportDataService {
                     playerGamificationEntity.setIndividualPlayerEntity(individualPlayerEntity);
                     playerGamificationEntity.setGameSubjectAcronym(gameSubjectAcronym);
                     playerGamificationEntity.setGameCourse(gameCourse);
-                    playerGamificationEntity.setGamePeriod(gamePeriod);
+                    playerGamificationEntity.setGamePeriod(PeriodType.fromString(gamePeriod));
                     playerGamificationRepository.save(playerGamificationEntity);
                 }
             }

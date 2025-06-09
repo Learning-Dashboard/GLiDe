@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import edu.upc.gessi.glidebackend.type.PeriodType;
 
 @Getter
 @Setter
@@ -28,8 +29,9 @@ public class PlayerGamificationEntity {
     @Column(name = "gameCourse")
     private Integer gameCourse;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "gamePeriod")
-    private String gamePeriod;
+    private PeriodType gamePeriod;
 
 
 }
