@@ -109,9 +109,11 @@ export class ProjectmonitoringComponent {
   constructor(private service: LearningdashboardService) {}
 
   ngOnInit() {
-
+    
     this.project_name = localStorage.getItem("project");
     this.player_name = localStorage.getItem("individualPlayername");
+    console.log("Project name: " + this.project_name);
+    console.log("Player name: " + this.player_name);
 
     window.addEventListener("resize", () => {
       for (let gauge in this.gaugeChartTasks) {
@@ -206,6 +208,7 @@ export class ProjectmonitoringComponent {
   private getProjectCategoriesSubscriber(result: any){
     let metricsWithCategories: any;
     metricsWithCategories = result;
+    console.log("Metrics with categories: " + JSON.stringify(metricsWithCategories));
 
     let categoryName : any;
     let categoryInformation : any;
@@ -213,6 +216,7 @@ export class ProjectmonitoringComponent {
     let current_bar_categories : any= [];
 
     for (let metric in this.selectedMetrics) {
+      console.log("Selected metric: " + this.selectedMetrics[metric]);
       categoryName = metricsWithCategories.find((x: {
         externalId: string
       }) => x.externalId === this.selectedMetrics[metric]).categoryName;
@@ -411,11 +415,24 @@ export class ProjectmonitoringComponent {
     }
 
     for (let metric in this.selectedHistoryMetrics) {
-      let id = 'historyChart_'+ this.selectedHistoryMetrics[metric];
-      let labels = this.labelsHistory[metric];
-      let data = this.dataHistory[metric]
+      let id = 'historyChart_' + this.selectedHistoryMetrics[metric];
+      const canvas = document.getElementById(id) as HTMLCanvasElement;
 
-      this.historyMetricsChart[metric] = new Chart(id, {
+      if (!canvas) {
+        console.warn("Canvas no trobat per a:", id);
+        continue; // 🔁 Salta al següent si no hi ha canvas encara
+      }
+
+      let labels = this.labelsHistory[metric];
+      let data = this.dataHistory[metric];
+
+      // ✅ Destrueix l’anterior si existeix
+      const existingChart = Chart.getChart(canvas);
+      if (existingChart) {
+        existingChart.destroy();
+      }
+
+      this.historyMetricsChart[metric] = new Chart(canvas, {
         type: 'line',
         data: {
           labels: labels,
@@ -423,7 +440,8 @@ export class ProjectmonitoringComponent {
             {
               label: this.project_name,
               data: data,
-            }]
+            }
+          ]
         },
         options: {
           maintainAspectRatio: false,
@@ -439,8 +457,9 @@ export class ProjectmonitoringComponent {
             }
           }
         },
-      })
+      });
     }
+
   }
 
   addEvent(type: string, event: MatDatepickerInputEvent<Date>) {

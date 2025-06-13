@@ -1,0 +1,116 @@
+/* Teacher Player Metrics Styles */
+.teacher-metrics-container {
+  padding: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.metrics-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.back-button {
+  margin-right: 15px;
+  color: #1976d2;
+}
+
+.back-button:hover {
+  background-color: rgba(25, 118, 210, 0.1);
+}
+
+.student-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 500;
+  color: #333;
+}
+
+.loading-container,
+.error-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  padding: 40px;
+}
+
+.loading-card,
+.error-card {
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+}
+
+.loading-content,
+.error-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.loading-icon {
+  font-size: 48px;
+  height: 48px;
+  width: 48px;
+  color: #1976d2;
+  animation: spin 2s linear infinite;
+}
+
+.error-icon {
+  font-size: 48px;
+  height: 48px;
+  width: 48px;
+  color: #f44336;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.metrics-content {
+  flex: 1;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  overflow: auto;
+}
+
+/* Tab styling to match the project */
+.tab-icon {
+  margin-right: 8px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .teacher-metrics-container {
+    padding: 10px;
+  }
+  
+  .student-title {
+    font-size: 20px;
+  }
+  
+  .back-button {
+    margin-right: 10px;
+  }
+}
+
+::ng-deep .mat-mdc-tab-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+::ng-deep .mat-mdc-tab-body-wrapper {
+  flex: 1;
+  overflow: auto;
+}

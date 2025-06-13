@@ -67,19 +67,30 @@ export class TeacherDashboardComponent implements OnInit {
       this.teacherService.getGameStudents(game.gameSubjectAcronym, game.gameCourse, game.gamePeriod).pipe(
         catchError((error: any) => {
           console.error(`Error loading students for game ${game.gameSubjectAcronym}:`, error);
-          return of([]);
+          return of([]); // Si falla, devolvemos una lista vacía
         })
       )
     );
 
     forkJoin(gameObservables).subscribe((results: any[]) => {
-      results.forEach((students, index) => {
-        const teams = this.groupStudentsByTeam(students || []);
-        this.gamesWithStudents.push({ game: games[index], teams });
+      // Construimos la estructura con los flags showTeams y showStudents
+      this.gamesWithStudents = results.map((students, index) => {
+        const teams = this.groupStudentsByTeam(students || []).map(team => ({
+          ...team,
+          showStudents: false // <- este controla el despliegue de estudiantes
+        }));
+
+        return {
+          game: games[index],
+          teams,
+          showTeams: false // <- este controla el despliegue de los equipos
+        };
       });
+
       this.loading = false;
     });
   }
+
 
   groupStudentsByTeam(students: any[]): any[] {
     const teamsMap = new Map<string, any[]>();
@@ -96,13 +107,18 @@ export class TeacherDashboardComponent implements OnInit {
       students
     }));
   }
-
-  viewStudentDetails(studentName: string): void {
+  
+  viewStudentDetails(studentName: string, game: any): void {
+    
+    localStorage.setItem('gameSubjectAcronym', game.gameSubjectAcronym);
+    localStorage.setItem('gameCourse', game.gameCourse);
+    localStorage.setItem('gamePeriod', game.gamePeriod);
+    
     this.router.navigate(['/teacher-player-metrics', studentName]);
   }
 
   getGameDisplayName(game: any): string {
-    return `${game.gameSubjectAcronym} - Curso ${game.gameCourse} - ${game.gamePeriod}`;
+    return `${game.gameSubjectAcronym} - ${game.gameCourse} - ${game.gamePeriod}`;
   }
 
   getTotalStudents(teams: any[]): number {
@@ -119,9 +135,7 @@ export class TeacherDashboardComponent implements OnInit {
 
 
   logout(): void {
-    localStorage.removeItem('idToken');
-    localStorage.removeItem('loggedUser');
-    localStorage.removeItem('userType');
+    localStorage.clear();
     this.router.navigate(['/login']);
   }
 }

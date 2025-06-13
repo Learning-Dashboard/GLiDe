@@ -88,6 +88,11 @@ export class LearningdashboardService {
     return this.http.get(this.backUrl + '/players/individuals');
   }
 
+  getDetailedIndividualPlayer(player_name: string) {
+    return this.http.get(this.backUrl + '/players/individuals/' + player_name);
+  }
+
+
   getIndividualPlayer(player_name: string) {
     return this.http.get(this.backUrl + '/gamification/players/individuals/' + player_name);
   }
