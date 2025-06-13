@@ -1,34 +1,57 @@
-<!-- Teacher Player Metrics Template -->
-<div class="teacher-metrics-container">
-  <!-- Header with student name and back button -->
-  <div class="metrics-header">
-    <button mat-icon-button (click)="goBackToDashboard()" class="back-button">
-      <mat-icon>arrow_back</mat-icon>
-    </button>
-    <h1 class="student-title">Student Metrics: {{ player_name }}</h1>
-  </div>
+<!-- Teacher Player Metrics Template with Sidebar -->
 
-  <!-- Main content with metrics tabs -->
-<div class="metrics-content">
-    <mat-tab-group style="height: 90%;">
-      <mat-tab>
-        <ng-template mat-tab-label>
-          <mat-icon class="tab-icon">person</mat-icon>
-          User Metrics
-        </ng-template>
-        <ng-template matTabContent>
-           <app-usermonitoring *ngIf="isUserReady"></app-usermonitoring>
-        </ng-template>
-      </mat-tab>
-      <mat-tab>
-        <ng-template mat-tab-label>
-          <mat-icon class="tab-icon">groups</mat-icon>
-          Project Metrics
-        </ng-template>
-        <ng-template matTabContent>
-          <app-projectmonitoring *ngIf="isProjectReady"></app-projectmonitoring>
-        </ng-template>
-      </mat-tab>
-    </mat-tab-group>
-  </div>
-</div>
+<mat-sidenav-container class="teacher-sidenav-container">
+  <!-- Sidebar Navigation -->
+  <mat-sidenav mode="side" opened class="teacher-sidenav">
+    <mat-toolbar color="primary">
+      <button mat-icon-button (click)="goBackToDashboard()" class="back-button">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <span>{{ player_name }}</span>
+    </mat-toolbar>
+    <mat-nav-list>
+      <mat-list-item 
+        (click)="switchView('monitoring')"
+        [class.active]="currentView === 'monitoring'">
+        <span matListItemTitle>Monitoring</span>
+      </mat-list-item>
+      <mat-list-item 
+        (click)="switchView('gamification')"
+        [class.active]="currentView === 'gamification'">
+        <span matListItemTitle>Gamification</span>
+      </mat-list-item>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <!-- Main Content -->
+  <mat-sidenav-content class="teacher-main-content">
+    <!-- Monitoring View -->
+    <div *ngIf="currentView === 'monitoring'" class="metrics-content">
+      <mat-tab-group style="height: 100%;">
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon class="tab-icon">person</mat-icon>
+            User Metrics
+          </ng-template>
+          <ng-template matTabContent>
+            <app-usermonitoring *ngIf="isUserReady"></app-usermonitoring>
+          </ng-template>
+        </mat-tab>
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon class="tab-icon">groups</mat-icon>
+            Project Metrics
+          </ng-template>
+          <ng-template matTabContent>
+            <app-projectmonitoring *ngIf="isProjectReady"></app-projectmonitoring>
+          </ng-template>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+
+    <!-- Gamification View -->
+    <div *ngIf="currentView === 'gamification'" class="gamification-content">
+      <app-gamificationtabs *ngIf="isGamificationReady"></app-gamificationtabs>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
