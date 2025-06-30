@@ -149,8 +149,8 @@ export class UsermonitoringComponent {
       for (let metric in this.metricsId) {
         let foundCategory;
       
-        const normalizedTaiga = this.user_name_Taiga.replaceAll(/[^a-zA-Z]/g, "_");
-        const normalizedGitHub = this.user_name_GitHub.replaceAll(/[^a-zA-Z]/g, "_");
+        const normalizedTaiga = this.user_name_Taiga.replaceAll(/[^a-zA-Z0-9]/g, "_");
+        const normalizedGitHub = this.user_name_GitHub.replaceAll(/[^a-zA-Z0-9]/g, "_");
         
       
         if (this.metricsId[metric] === "assignedtasks" || this.metricsId[metric] === "closedtasks") {
@@ -197,10 +197,11 @@ export class UsermonitoringComponent {
       for (let student in this.result_metrics) {
         student_name = this.result_metrics[student].name;
         metrics = this.result_metrics[student].metrics;
-        console.log(`Processing metrics for student: ${student_name}`);
-        console.log(`Metrics: ${JSON.stringify(metrics)}`);
+        //console.log(`Processing metrics for student: ${student_name}`);
+        //console.log(`Metrics: ${JSON.stringify(metrics)}`);
 
         let user_metrics_id = metrics.map((item: any) => ({id: item.id, value: item.value}));
+       
 
         for (let metric in metrics) {
           metric_id = this.result_metrics[student].metrics[metric].id;
@@ -208,40 +209,56 @@ export class UsermonitoringComponent {
           let metric_value;
           if (metric_id == 'assignedtasks') {
             metric_value = this.result_metrics[student].metrics[metric].value*100;
-            console.log(`Assigned tasks for ${student_name}: ${metric_value}`);
+            //console.log(`Assigned tasks for ${student_name}: ${metric_value}`);
             dataTasks.push(metric_value);
-            if (this.result_metrics[student].name == this.user_name) this.map_current_metrics.set("Tasks", Math.round(metric_value * 100) / 100);
+            //console.log("Comparant ASSIGNED TASKS:", this.result_metrics[student].name, "vs", this.user_name);
+            if (this.result_metrics[student].name == this.user_name) {
+              //console.log("Setting current metric for Tasks:", Math.round(metric_value * 100) / 100);
+              this.map_current_metrics.set("Tasks", Math.round(metric_value * 100) / 100);
+            }
             totalTasks = totalTasks - this.result_metrics[student].metrics[metric].value*100;
             labelsTasks.push(student_name);
           }
           else if (metric_id == 'closedtasks') {
             metric_value = this.result_metrics[student].metrics[metric].value*100;
-            console.log(`Closed tasks for ${student_name}: ${metric_value}`);
+            //console.log(`Closed tasks for ${student_name}: ${metric_value}`);
             dataClosedTasks.push(metric_value);
-            if (this.result_metrics[student].name == this.user_name) this.map_current_metrics.set("Closed tasks", Math.round(metric_value * 100) / 100);
+            //console.log("Comparant CLOSED TASKS:", this.result_metrics[student].name, "vs", this.user_name);
+            if (this.result_metrics[student].name == this.user_name) {
+              //console.log("Setting current metric for Closed tasks:", Math.round(metric_value * 100) / 100);
+              this.map_current_metrics.set("Closed tasks", Math.round(metric_value * 100) / 100);
+            }
             labelsClosedTasks.push(student_name);
           }
           else if (metric_id == 'modifiedlines') {
             metric_value = this.result_metrics[student].metrics[metric].value*100;
-            console.log(`Modified lines for ${student_name}: ${metric_value}`);
+            //console.log(`Modified lines for ${student_name}: ${metric_value}`);
             dataModifiedLines.push(metric_value);
-            if (this.result_metrics[student].name == this.user_name) this.map_current_metrics.set("Modified lines", Math.round(metric_value * 100) / 100);
+            //console.log("Comparant MODIFIED LINES:", this.result_metrics[student].name, "vs", this.user_name);
+            if (this.result_metrics[student].name == this.user_name) {
+              this.map_current_metrics.set("Modified lines", Math.round(metric_value * 100) / 100);
+              //console.log("Setting current metric for Modified lines:", Math.round(metric_value * 100) / 100);
+            }
             labelsModifiedLines.push(student_name);
           }
           else if (metric_id == 'commits') {
             metric_value = this.result_metrics[student].metrics[metric].value*100;
-            console.log(`Commits for ${student_name}: ${metric_value}`);
+            //console.log(`Commits for ${student_name}: ${metric_value}`);
             dataCommits.push(metric_value);
-            if (this.result_metrics[student].name == this.user_name) this.map_current_metrics.set("Commits", Math.round(metric_value * 100) / 100);
+            //console.log("Comparant COMMITS:", this.result_metrics[student].name, "vs", this.user_name);
+            if (this.result_metrics[student].name == this.user_name) {
+              this.map_current_metrics.set("Commits", Math.round(metric_value * 100) / 100);
+              //console.log("Setting current metric for Commits:", Math.round(metric_value * 100) / 100);
+            }
             labelsCommits.push(student_name);
           }
         }
 
         if (this.result_metrics[student].name === this.user_name) {
           const getValue = (id: string) => {
-            console.log(`Searching for metric with id: ${id}`);
+            //console.log(`Searching for metric with id: ${id}`);
             const metric = user_metrics_id.find((x: { id: string }) => x.id === id);
-            console.log(`Found metric: ${JSON.stringify(metric)}`);
+            //console.log(`Found metric: ${JSON.stringify(metric)}`);
             return metric ? metric.value : 0; // Usa 0 o null según tu lógica
           };
         
@@ -253,7 +270,7 @@ export class UsermonitoringComponent {
           this.current_metrics.push(getValue('closedtasks_' + taigaId));
           this.current_metrics.push(getValue('modifiedlines_' + githubId));
           this.current_metrics.push(getValue('commits_' + githubId));
-          console.log(`Current metrics for ${this.user_name}:`, this.current_metrics);
+          //console.log(`Current metrics for ${this.user_name}:`, this.current_metrics);
         }
         
       }
