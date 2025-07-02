@@ -15,6 +15,7 @@ public class PlayerMapper {
         individualPlayerDto.setLearningdashboardUsername(individualPlayerEntity.getStudentUserEntity().getLearningdashboardUsername());
         individualPlayerDto.setGithubUsername(individualPlayerEntity.getStudentUserEntity().getGithubUsername());
         individualPlayerDto.setTaigaUsername(individualPlayerEntity.getStudentUserEntity().getTaigaUsername());
+        individualPlayerDto.setNickname(individualPlayerEntity.getStudentUserEntity().getNickname());
         return individualPlayerDto;
     }
 

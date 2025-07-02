@@ -21,4 +21,5 @@ public class IndividualPlayerDto {
     private String learningdashboardUsername;
     private String githubUsername;
     private String taigaUsername;
+    private String nickname;
 }

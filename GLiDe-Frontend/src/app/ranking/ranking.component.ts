@@ -29,12 +29,18 @@ export class RankingComponent {
   protected position = 0;
   private maxPoints: any;
 
+
+  private studentNicknamesMap = new Map<string, string>();
+
   constructor(private service: LearningdashboardService) {  }
 
   /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
   displayedColumns = ['position', 'name', 'points'];
 
   ngOnChanges(){
+    // Load student nicknames first
+    this.loadStudentNicknames();
+    
     this.dataSource = [];
     this.data = [];
     this.list = [];
@@ -55,8 +61,8 @@ export class RankingComponent {
         if (this.position == 1) this.maxPoints = this.data[a].points;
         let percent = (this.data[a].points / this.maxPoints) * 100;
         let name: any;
-        if ((this.data[a].playername == this.teamPlayerName || this.data[a].playername == this.individualPlayerName) || anonymization == "None") name = this.data[a].playername;
-        else if (anonymization == "Partial" && this.position < 4) name = this.data[a].playername;
+        if ((this.data[a].playername == this.teamPlayerName || this.data[a].playername == this.individualPlayerName) || anonymization == "None") name = this.getDisplayName(this.data[a]);
+        else if (anonymization == "Partial" && this.position < 4) name = this.getDisplayName(this.data[a]);
         else name = "-";
         this.list.push({name: name, points: this.data[a].achievementunits, position: this.position, percent: percent});
       }
@@ -68,5 +74,27 @@ export class RankingComponent {
       this.dataSource.paginator = this.paginator;
       this.table.dataSource = this.dataSource;
     })
+  }
+
+  public getDisplayName(player: any): string {
+    if (player?.nickname) return player.nickname;
+
+    const name = player?.playername ?? player?.name ?? '';
+    return this.studentNicknamesMap.get(name) || name;
+  }
+
+  private loadStudentNicknames() {
+    const project = localStorage.getItem('project');
+    if (project) {
+      this.service.getProjectStudentsWithNicknames(project).subscribe((students: any) => {
+        if (Array.isArray(students)) {
+          students.forEach((student: any) => {
+            if (student.nickname) {
+              this.studentNicknamesMap.set(student.name, student.nickname);
+            }
+          });
+        }
+      });
+    }
   }
 }

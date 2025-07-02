@@ -1,6 +1,7 @@
 package edu.upc.gessi.glidebackend.controller;
 
 import edu.upc.gessi.glidebackend.dto.IndividualPlayerDto;
+import edu.upc.gessi.glidebackend.dto.StudentNicknameDto;
 import edu.upc.gessi.glidebackend.service.StudentService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,21 @@ public class StudentController {
             @PathVariable Integer course,
             @PathVariable String period) {
         List<IndividualPlayerDto> students = studentService.getStudentsByGame(subjectAcronym, course, period);
+        return ResponseEntity.ok(students);
+    }
+
+    @CrossOrigin(origins = "http://localhost:4201")
+    @PostMapping(value="/updateNickname")
+    public ResponseEntity<?> updateNickname(@RequestHeader(HttpHeaders.AUTHORIZATION) String idToken,
+                                            @RequestParam String nickname) {
+        studentService.updateNickname(idToken, nickname);
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+    @CrossOrigin(origins = "http://localhost:4201")
+    @GetMapping(value="/project/nicknames")
+    public ResponseEntity<List<StudentNicknameDto>> getProjectStudentsWithNicknames(@RequestParam String project) {
+        List<StudentNicknameDto> students = studentService.getProjectStudentsWithNicknames(project);
         return ResponseEntity.ok(students);
     }
 }

@@ -10,16 +10,29 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
+import edu.upc.gessi.glidebackend.entity.IndividualPlayerEntity;
+import edu.upc.gessi.glidebackend.entity.StudentUserEntity;
+import edu.upc.gessi.glidebackend.repository.IndividualPlayerRepository;
+import edu.upc.gessi.glidebackend.service.impl.GamificationServiceImpl;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 import java.lang.reflect.Field;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.any;
 
 class GamificationServiceUnitTests {
     @InjectMocks
     private GamificationServiceImpl gamificationService;
+
+    @Mock
+    private IndividualPlayerRepository individualPlayerRepository;
 
     @Mock
     private RestTemplate restTemplate;
@@ -45,23 +58,38 @@ class GamificationServiceUnitTests {
     void testGetIndividualPlayer_Success() {
         String mockPlayername = "player123";
         String mockUri = gamificationAPIBaseURL + "/players/individuals/" + mockPlayername;
-        Object mockResponse = new Object();
 
-        when(restTemplate.getForObject(mockUri, Object.class)).thenReturn(mockResponse);
+        Map<String, Object> mockResponse = new HashMap<>();
+        mockResponse.put("playername", mockPlayername);
+        mockResponse.put("points", 0);
+        mockResponse.put("level", 1);
+
+        IndividualPlayerEntity mockEntity = new IndividualPlayerEntity();
+        StudentUserEntity student = new StudentUserEntity();
+        student.setNickname("mockNickname");
+        mockEntity.setStudentUserEntity(student);
+
+        when(restTemplate.getForObject(mockUri, Map.class)).thenReturn(mockResponse);
+        when(individualPlayerRepository.findById(mockPlayername)).thenReturn(Optional.of(mockEntity));
 
         Object result = gamificationService.getIndividualPlayer(mockPlayername);
-        System.out.println(result);
 
-        assertEquals(mockResponse, result);
-        Mockito.verify(restTemplate).getForObject(mockUri, Object.class);
+        assertTrue(result instanceof Map);
+        Map<String, Object> resultMap = (Map<String, Object>) result;
+        assertEquals("mockNickname", resultMap.get("nickname"));
+        assertEquals(mockPlayername, resultMap.get("playername"));
+        assertEquals(0, resultMap.get("points"));
+
+        verify(restTemplate).getForObject(mockUri, Map.class);
     }
+
 
     @Test
     void testGetIndividualPlayer_Failure() {
         String mockPlayername = "player123";
         String mockUri = gamificationAPIBaseURL + "/players/individuals/" + mockPlayername;
 
-        when(restTemplate.getForObject(mockUri, Object.class)).thenThrow(new RuntimeException("Error"));
+        when(restTemplate.getForObject(mockUri, Map.class)).thenThrow(new RuntimeException("Error"));
 
         Object result = gamificationService.getIndividualPlayer(mockPlayername);
 

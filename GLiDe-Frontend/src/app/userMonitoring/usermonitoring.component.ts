@@ -59,6 +59,9 @@ export class UsermonitoringComponent {
   private lineCharts: any = [];
 
   protected map_current_metrics = new Map<string, number>();
+  
+  // Map to store student nicknames
+  private studentNicknamesMap = new Map<string, string>();
 
   range = new FormGroup({
     start: new FormControl<Date | null>(null),
@@ -112,17 +115,20 @@ export class UsermonitoringComponent {
       this.gaugeChartModifiedLines.resize();
       this.gaugeChartCommits.resize();
 
-      const optionTasks = this.changeOption(this.current_metrics[0], this.current_categories[0]);
+      const optionTasks = this.changeOption(this.current_metrics[0], this.current_categories[0], this.user_name);
       this.gaugeChartTasks.setOption(optionTasks);
-      const optionClosedTasks = this.changeOption(this.current_metrics[1], this.current_categories[1]);
+      const optionClosedTasks = this.changeOption(this.current_metrics[1], this.current_categories[1], this.user_name);
       this.gaugeChartClosedTasks.setOption(optionClosedTasks);
-      const optionModifiedLines = this.changeOption(this.current_metrics[2], this.current_categories[2]);
+      const optionModifiedLines = this.changeOption(this.current_metrics[2], this.current_categories[2], this.user_name);
       this.gaugeChartModifiedLines.setOption(optionModifiedLines);
-      const optionCommits = this.changeOption(this.current_metrics[3], this.current_categories[3]);
+      const optionCommits = this.changeOption(this.current_metrics[3], this.current_categories[3], this.user_name);
       this.gaugeChartCommits.setOption(optionCommits);
     });
 
     this.notInitial = true;
+
+    // Load student nicknames first
+    this.loadStudentNicknames();
 
     this.service.getSelectedMetrics(this.player_name).pipe(switchMap(result => {
       this.setSelectedRange(result);
@@ -195,7 +201,7 @@ export class UsermonitoringComponent {
       let dataCommits: any = [];
 
       for (let student in this.result_metrics) {
-        student_name = this.result_metrics[student].name;
+        student_name = this.getDisplayName(this.result_metrics[student]);
         metrics = this.result_metrics[student].metrics;
         //console.log(`Processing metrics for student: ${student_name}`);
         //console.log(`Metrics: ${JSON.stringify(metrics)}`);
@@ -217,7 +223,7 @@ export class UsermonitoringComponent {
               this.map_current_metrics.set("Tasks", Math.round(metric_value * 100) / 100);
             }
             totalTasks = totalTasks - this.result_metrics[student].metrics[metric].value*100;
-            labelsTasks.push(student_name);
+            labelsTasks.push(this.getDisplayName(this.result_metrics[student]));
           }
           else if (metric_id == 'closedtasks') {
             metric_value = this.result_metrics[student].metrics[metric].value*100;
@@ -228,7 +234,7 @@ export class UsermonitoringComponent {
               //console.log("Setting current metric for Closed tasks:", Math.round(metric_value * 100) / 100);
               this.map_current_metrics.set("Closed tasks", Math.round(metric_value * 100) / 100);
             }
-            labelsClosedTasks.push(student_name);
+            labelsClosedTasks.push(this.getDisplayName(this.result_metrics[student]));
           }
           else if (metric_id == 'modifiedlines') {
             metric_value = this.result_metrics[student].metrics[metric].value*100;
@@ -239,7 +245,7 @@ export class UsermonitoringComponent {
               this.map_current_metrics.set("Modified lines", Math.round(metric_value * 100) / 100);
               //console.log("Setting current metric for Modified lines:", Math.round(metric_value * 100) / 100);
             }
-            labelsModifiedLines.push(student_name);
+            labelsModifiedLines.push(this.getDisplayName(this.result_metrics[student]));
           }
           else if (metric_id == 'commits') {
             metric_value = this.result_metrics[student].metrics[metric].value*100;
@@ -250,7 +256,7 @@ export class UsermonitoringComponent {
               this.map_current_metrics.set("Commits", Math.round(metric_value * 100) / 100);
               //console.log("Setting current metric for Commits:", Math.round(metric_value * 100) / 100);
             }
-            labelsCommits.push(student_name);
+            labelsCommits.push(this.getDisplayName(this.result_metrics[student]));
           }
         }
 
@@ -295,7 +301,7 @@ export class UsermonitoringComponent {
     });
   }
 
-  private changeOption(value: number, categories: any[]) {
+  private changeOption(value: number, categories: any[], studentName: string) {
     let option: EChartsOption;
     return option = {
       series: [
@@ -373,7 +379,7 @@ export class UsermonitoringComponent {
           data: [
             {
               value: value,
-              name: this.user_name
+              name: this.getDisplayName({ name: studentName })
             }
           ]
         }
@@ -384,22 +390,22 @@ export class UsermonitoringComponent {
   private updateCharts() {
     this.chartDomTasks = document.getElementById('gaugeChart_' + this.items[0])!;
     this.gaugeChartTasks = echarts.init(this.chartDomTasks);
-    const optionTasks = this.changeOption(this.current_metrics[0], this.current_categories[0]);
+    const optionTasks = this.changeOption(this.current_metrics[0], this.current_categories[0], this.user_name);
     optionTasks && this.gaugeChartTasks.setOption(optionTasks);
 
     this.chartDomClosedTasks = document.getElementById('gaugeChart_' + this.items[1])!;
     this.gaugeChartClosedTasks = echarts.init(this.chartDomClosedTasks);
-    const optionClosedTasks = this.changeOption(this.current_metrics[1], this.current_categories[1]);
+    const optionClosedTasks = this.changeOption(this.current_metrics[1], this.current_categories[1], this.user_name);
     optionClosedTasks && this.gaugeChartClosedTasks.setOption(optionClosedTasks);
 
     this.chartDomModifiedLines = document.getElementById('gaugeChart_' + this.items[2])!;
     this.gaugeChartModifiedLines = echarts.init(this.chartDomModifiedLines);
-    const optionModifiedLines = this.changeOption(this.current_metrics[2], this.current_categories[2]);
+    const optionModifiedLines = this.changeOption(this.current_metrics[2], this.current_categories[2], this.user_name);
     optionModifiedLines && this.gaugeChartModifiedLines.setOption(optionModifiedLines);
 
     this.chartDomCommits = document.getElementById('gaugeChart_' + this.items[3])!;
     this.gaugeChartCommits = echarts.init(this.chartDomCommits);
-    const optionCommits = this.changeOption(this.current_metrics[3], this.current_categories[3]);
+    const optionCommits = this.changeOption(this.current_metrics[3], this.current_categories[3], this.user_name);
     optionCommits && this.gaugeChartCommits.setOption(optionCommits);
   }
 
@@ -506,7 +512,7 @@ export class UsermonitoringComponent {
     let dataCommitsHistory = [];
 
     for (let student in this.history_metrics_result) {
-      student_name = this.history_metrics_result[student].name;
+      student_name = this.getDisplayName(this.history_metrics_result[student]);
       metrics = this.history_metrics_result[student].metrics;
       if (this.history_metrics_result[student].name != null) {
         let dataTasksHistoryStudent = [];
@@ -530,10 +536,10 @@ export class UsermonitoringComponent {
             if (this.history_metrics_result[student].name == this.user_name) labelsCommitsHistory.push(this.history_metrics_result[student].metrics[metric].date.split("-").reverse().join("-"));
           }
         }
-        dataTasksHistory.push({label: this.history_metrics_result[student].name, data: dataTasksHistoryStudent.reverse()});
-        dataClosedTasksHistory.push({label: this.history_metrics_result[student].name, data: dataClosedTasksHistoryStudent.reverse()});
-        dataModifiedLinesHistory.push({label: this.history_metrics_result[student].name, data: dataModifiedLinesHistoryStudent.reverse()});
-        dataCommitsHistory.push({label: this.history_metrics_result[student].name, data: dataCommitsHistoryStudent.reverse()});
+        dataTasksHistory.push({label: this.getDisplayName(this.history_metrics_result[student]), data: dataTasksHistoryStudent.reverse()});
+        dataClosedTasksHistory.push({label: this.getDisplayName(this.history_metrics_result[student]), data: dataClosedTasksHistoryStudent.reverse()});
+        dataModifiedLinesHistory.push({label: this.getDisplayName(this.history_metrics_result[student]), data: dataModifiedLinesHistoryStudent.reverse()});
+        dataCommitsHistory.push({label: this.getDisplayName(this.history_metrics_result[student]), data: dataCommitsHistoryStudent.reverse()});
       }
       student_it += 1;
     }
@@ -577,5 +583,31 @@ export class UsermonitoringComponent {
   }
 
   addEvent(type: string, event: MatDatepickerInputEvent<Date>) {
+  }
+
+  private loadStudentNicknames(): void {
+    if (this.project_name) {
+      this.service.getProjectStudentsWithNicknames(this.project_name).subscribe(
+        (students: Object) => {
+          this.studentNicknamesMap.clear();
+          const studentsArray = students as any[];
+          studentsArray.forEach(student => {
+            if (student.nickname) {
+              this.studentNicknamesMap.set(student.name, student.nickname);
+            }
+          });
+        },
+        (error) => {
+          console.error('Error loading student nicknames:', error);
+        }
+      );
+    }
+  }
+
+  public getDisplayName(player: any): string {
+    if (player?.nickname) return player.nickname;
+
+    const name = player?.playername ?? player?.name ?? '';
+    return this.studentNicknamesMap.get(name) || name;
   }
 }

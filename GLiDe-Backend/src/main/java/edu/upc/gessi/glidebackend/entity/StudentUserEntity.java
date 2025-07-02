@@ -27,6 +27,9 @@ public class StudentUserEntity {
     @Column(name = "taiga_username", nullable = false)
     private String taigaUsername;
 
+    @Column(name = "nickname", nullable = true)
+    private String nickname;
+
     @OneToMany(mappedBy = "studentUserEntity", fetch = FetchType.LAZY)
     private List<IndividualPlayerEntity> individualPlayerEntities;
 

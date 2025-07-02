@@ -3,7 +3,7 @@
     <mat-card *ngIf="individualPlayer" class="player-card" style="flex: 1 1 auto">
       <mat-card-header>
         <img mat-card-avatar class="header-image" [src]="individualPlayer.avatar" alt="avatar">
-        <mat-card-title>Individual: <strong>{{individualPlayer.playername}}</strong></mat-card-title>
+        <mat-card-title>Individual: <strong>{{getDisplayName(individualPlayer)}}</strong></mat-card-title>
         <mat-card-subtitle>Role: {{individualPlayer.role}}</mat-card-subtitle>
         <mat-card-subtitle>LEVEL {{individualPlayer.level}}</mat-card-subtitle>
       </mat-card-header>

@@ -39,6 +39,7 @@ export class UserComponent {
   protected gamification : any;
   protected players : any;
   protected teams : any;
+  protected nickname: string = '';
 
   protected selectedPlayer: any;
 
@@ -159,6 +160,7 @@ export class UserComponent {
     localStorage.setItem('project', selected.project);
     localStorage.setItem('teamPlayername', selected.teamPlayername);
     localStorage.setItem('individualPlayername', selected.playername);
+    localStorage.setItem('nickname', selected.nickname || '');
 
     let individualPlayername: any;
 
@@ -210,8 +212,30 @@ export class UserComponent {
           this.selectedPlayer = this.result[0].playername;
           this.saveUserData();
         }
+        const selected = this.result.find((x: any) => x.playername === this.selectedPlayer);
+        if (selected?.nickname) {
+          this.nickname = selected.nickname;
+        }
       });
     }
   }
 
+  updateNickname() {
+    const idToken = localStorage.getItem('idToken');
+    if (!idToken || !this.nickname) return;
+
+    this.service.updateNickname(idToken, this.nickname).subscribe({
+      next: () => {
+        localStorage.setItem('nickname', this.nickname);
+        
+        const selectedIndex = this.result.findIndex((x: any) => x.playername === this.selectedPlayer);
+        if (selectedIndex !== -1) {
+          this.result[selectedIndex].nickname = this.nickname;
+        }
+      },
+      error: () => {
+        this.toastr.error('Error actualitzant el nickname');
+      }
+    });
+  }
 }

@@ -22,4 +22,10 @@ public interface IndividualPlayerRepository extends JpaRepository<IndividualPlay
             @Param("subjectAcronym") String subjectAcronym,
             @Param("course") Integer course,
             @Param("period") PeriodType period);
+    
+    @Query("""
+        SELECT ip FROM IndividualPlayerEntity ip
+        WHERE ip.teamPlayerEntity.project = :project
+    """)
+    List<IndividualPlayerEntity> findByProject(@Param("project") String project);
 }

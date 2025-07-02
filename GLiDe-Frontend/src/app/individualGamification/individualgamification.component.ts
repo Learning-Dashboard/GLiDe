@@ -73,16 +73,20 @@ export class IndividualgamificationComponent {
   private gameSubjectAcronym: any;
   private gameCourse: any;
   private gamePeriod: any;
+  protected project_name: any;
+  private studentNicknamesMap = new Map<string, string>();
 
   constructor(private service: LearningdashboardService, private sanitizer: DomSanitizer, public dialog: MatDialog) {}
 
   ngOnInit() {
+    this.loadStudentNicknames();
 
     this.individualPlayerName = localStorage.getItem("individualPlayername");
     this.teamPlayerName = localStorage.getItem("teamPlayername");
     this.gameSubjectAcronym = localStorage.getItem('gameSubjectAcronym');
     this.gameCourse = localStorage.getItem('gameCourse');
     this.gamePeriod = localStorage.getItem('gamePeriod');
+    this.project_name = localStorage.getItem('project');
 
     if (this.individualPlayerName != null && this.teamPlayerName != null) {
 
@@ -143,6 +147,28 @@ export class IndividualgamificationComponent {
     const dialogRef = this.dialog.open(DialogContentMissingDialog);
     dialogRef.afterClosed().subscribe(result => {
     });
+  }
+
+  private loadStudentNicknames(): void {
+    const project = this.project_name; 
+    if (project) {
+      this.service.getProjectStudentsWithNicknames(project).subscribe((response: any) => {
+        const students = response as any[];
+        console.log('Students with nicknames:', students);
+        students.forEach(student => {
+          if (student.nickname) {
+            this.studentNicknamesMap.set(student.name, student.nickname);
+          }
+        });
+      });
+    }
+  }
+
+  public getDisplayName(player: any): string {
+    if (player?.nickname) return player.nickname;
+
+    const name = player?.playername ?? player?.name ?? '';
+    return this.studentNicknamesMap.get(name) || name;
   }
 }
 

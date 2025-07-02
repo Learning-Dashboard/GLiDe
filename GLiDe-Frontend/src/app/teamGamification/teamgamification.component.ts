@@ -85,8 +85,11 @@ export class TeamgamificationComponent {
   private gameSubjectAcronym: any;
   private gameCourse: any;
   private gamePeriod: any;
+  protected project_name: any;
   
   public selectedDate: Date | null = null;
+
+  private studentNicknamesMap = new Map<string, string>();
 
   constructor(private service: LearningdashboardService, private sanitizer: DomSanitizer, public dialog: MatDialog) {}
 
@@ -97,6 +100,9 @@ export class TeamgamificationComponent {
     this.gameSubjectAcronym = localStorage.getItem('gameSubjectAcronym');
     this.gameCourse = localStorage.getItem('gameCourse');
     this.gamePeriod = localStorage.getItem('gamePeriod');
+    this.project_name = localStorage.getItem('project');
+
+    this.loadStudentNicknames();
 
     if (this.individualPlayerName != null && this.teamPlayerName != null) {
 
@@ -189,6 +195,28 @@ export class TeamgamificationComponent {
         alert('Error durant l\'avaluació.');
       }
     });
+  }
+
+  private loadStudentNicknames(): void {
+    const project = this.project_name; 
+    if (project) {
+      this.service.getProjectStudentsWithNicknames(project).subscribe((response: any) => {
+        const students = response as any[];
+        console.log('Students with nicknames:', students);
+        students.forEach(student => {
+          if (student.nickname) {
+            this.studentNicknamesMap.set(student.name, student.nickname);
+          }
+        });
+      });
+    }
+  }
+
+  public getDisplayName(player: any): string {
+    if (player?.nickname) return player.nickname;
+
+    const name = player?.playername ?? player?.name ?? '';
+    return this.studentNicknamesMap.get(name) || name;
   }
 }
 

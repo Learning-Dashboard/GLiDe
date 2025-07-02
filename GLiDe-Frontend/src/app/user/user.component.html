@@ -3,24 +3,35 @@
     <mat-card-title>Select User</mat-card-title>
   </mat-card-header>
   <mat-card-content class="card-content">
-    <mat-radio-group [(ngModel)]="selectedPlayer" (ngModelChange)="onPlayerSelected($event)" *ngIf="players && teams">
-      <mat-radio-button class="player-card" *ngFor="let res of result; let i = index" [value]="res.playername">
-        <div class="radio-content">
-          <img mat-card-avatar [src]="players[i].avatar" alt="avatar" class="avatar">
-          <span class="name">{{ res.playername }}</span>
-          <div class="details">
-            <span class="level">Level: {{ players[i].level }}</span>
-            <span class="points">Points: {{ players[i].points }}</span>
+    <div class="user-selection-wrapper" *ngIf="players && teams">
+      <mat-radio-group [(ngModel)]="selectedPlayer" (ngModelChange)="onPlayerSelected($event)">
+        <mat-radio-button class="player-card" *ngFor="let res of result; let i = index" [value]="res.playername">
+          <div class="radio-content">
+            <img mat-card-avatar [src]="players[i].avatar" alt="avatar" class="avatar">
+            <span class="name">{{ res.nickname || res.playername }}</span>
+            <div class="details">
+              <span class="level">Level: {{ players[i].level }}</span>
+              <span class="points">Points: {{ players[i].points }}</span>
+            </div>
+            <img mat-card-avatar [src]="teams[i].logo" alt="logo" class="avatar">
+            <span class="team-name">{{ teams[i].playername }}</span>
+            <div class="details">
+              <span class="team-level">Team Level: {{ teams[i].level }}</span>
+              <span class="team-points">Team Points: {{ teams[i].points }}</span>
+            </div>
           </div>
-          <img mat-card-avatar [src]="teams[i].logo" alt="logo" class="avatar">
-          <span class="team-name">{{ teams[i].playername }}</span>
-          <div class="details">
-            <span class="team-level">Team Level: {{ teams[i].level }}</span>
-            <span class="team-points">Team Points: {{ teams[i].points }}</span>
-          </div>
-        </div>
-      </mat-radio-button>
-    </mat-radio-group>    
+        </mat-radio-button>
+      </mat-radio-group>
+
+      <!-- Formulari fora del rectangle blavós, a la dreta -->
+      <div class="nickname-box" *ngIf="selectedPlayer">
+        <mat-form-field appearance="fill" class="nickname-field">
+          <mat-label>Nickname</mat-label>
+          <input matInput [(ngModel)]="nickname" placeholder="Write a nickname" />
+        </mat-form-field>
+        <button mat-raised-button color="primary" class="nickname-save-button" (click)="updateNickname()">Save</button>
+      </div>
+    </div>
   </mat-card-content>
   <div class="button-div">
     <button mat-raised-button color="primary" (click)="logOut()">Log out</button>

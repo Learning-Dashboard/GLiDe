@@ -146,4 +146,19 @@ export class LearningdashboardService {
     });
   }
 
+  updateNickname(idToken: string, nickname: string) {
+    return this.http.post(this.backUrl + '/students/updateNickname', null, {
+      params: { nickname },
+      headers: {
+        Authorization: idToken
+      }
+    });
+  }
+
+  getProjectStudentsWithNicknames(project: string) {
+    let params = new HttpParams()
+      .set('project', project);
+    return this.http.get(this.backUrl + '/students/project/nicknames', {params: params});
+  }
+
 }

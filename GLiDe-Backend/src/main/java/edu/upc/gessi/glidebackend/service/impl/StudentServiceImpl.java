@@ -2,6 +2,7 @@ package edu.upc.gessi.glidebackend.service.impl;
 
 import edu.upc.gessi.glidebackend.dto.IndividualPlayerDto;
 import edu.upc.gessi.glidebackend.dto.StudentUserDto;
+import edu.upc.gessi.glidebackend.dto.StudentNicknameDto;
 import edu.upc.gessi.glidebackend.entity.IndividualPlayerEntity;
 import edu.upc.gessi.glidebackend.entity.StudentUserEntity;
 import edu.upc.gessi.glidebackend.exception.ResourceNotFoundException;
@@ -55,4 +56,33 @@ public class StudentServiceImpl implements StudentService {
                 .map(PlayerMapper::mapToIndividualPlayerDto)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    @Transactional
+    public void updateNickname(String idToken, String nickname) {
+        String email = authService.getTokenMail(idToken);
+        StudentUserEntity studentUserEntity = studentUserRepository.findById(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
+        studentUserEntity.setNickname(nickname);
+        studentUserRepository.save(studentUserEntity);
+    }
+
+    @Override
+    @Transactional
+    public List<StudentNicknameDto> getProjectStudentsWithNicknames(String project) {
+        List<IndividualPlayerEntity> individualPlayerEntities = individualPlayerRepository
+                .findByProject(project);
+        
+        return individualPlayerEntities.stream()
+                .map(player -> {
+                    StudentUserEntity student = player.getStudentUserEntity();
+                    return new StudentNicknameDto(
+                            student.getLearningdashboardUsername(),
+                            student.getNickname()
+                    );
+                })
+                .distinct() 
+                .collect(Collectors.toList());
+    }
+                
 }

@@ -67,6 +67,7 @@ export class TeacherPlayerMetricsComponent implements OnInit {
                     localStorage.setItem("taigaUsername", player.taigaUsername);
                     localStorage.setItem("project", player.project);
                     localStorage.setItem("teamPlayername", player.project);
+                    localStorage.setItem("nickname", player.nickname || '');
 
                     this.isUserReady = true;
                     this.isProjectReady = true;

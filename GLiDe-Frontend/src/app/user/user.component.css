@@ -74,3 +74,26 @@
   display: flex;
   justify-content: right;
 }
+
+.user-selection-wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 40px;
+}
+
+.nickname-box {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.nickname-field {
+  min-width: 200px;
+}
+
+.nickname-save-button {
+  height: 56px;
+  margin-bottom: 1.25em;
+}
