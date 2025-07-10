@@ -23,13 +23,36 @@
         </mat-radio-button>
       </mat-radio-group>
 
-      <!-- Formulari fora del rectangle blavós, a la dreta -->
+      <!-- Formulari nickname -->
       <div class="nickname-box" *ngIf="selectedPlayer">
         <mat-form-field appearance="fill" class="nickname-field">
           <mat-label>Nickname</mat-label>
           <input matInput [(ngModel)]="nickname" placeholder="Write a nickname" />
         </mat-form-field>
         <button mat-raised-button color="primary" class="nickname-save-button" (click)="updateNickname()">Save</button>
+      </div>
+      
+      <!-- Canvi d'avatar -->
+      <div class="avatar-box" *ngIf="selectedPlayer">
+        <mat-form-field appearance="fill" class="avatar-field">
+          <mat-label>Change avatar</mat-label>
+          <input matInput [value]="selectedFileName" readonly />
+          <button mat-icon-button matSuffix (click)="avatarInput.click()" aria-label="Select avatar">
+            <mat-icon>upload</mat-icon>
+          </button>
+          <input #avatarInput type="file" accept="image/*" hidden (change)="onAvatarSelected($event)" />
+        </mat-form-field>
+      </div>
+      <!-- Canvi de logo d'equip -->
+      <div class="avatar-box" *ngIf="selectedPlayer">
+        <mat-form-field appearance="fill" class="avatar-field">
+          <mat-label>Change team logo</mat-label>
+          <input matInput [value]="selectedTeamLogoFileName" readonly />
+          <button mat-icon-button matSuffix (click)="teamLogoInput.click()" aria-label="Select team logo">
+            <mat-icon>upload</mat-icon>
+          </button>
+          <input #teamLogoInput type="file" accept="image/*" hidden (change)="onTeamLogoSelected($event)" />
+        </mat-form-field>
       </div>
     </div>
   </mat-card-content>

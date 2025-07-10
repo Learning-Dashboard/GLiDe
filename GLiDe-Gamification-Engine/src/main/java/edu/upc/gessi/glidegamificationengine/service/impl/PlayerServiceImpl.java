@@ -173,7 +173,7 @@ public class PlayerServiceImpl implements PlayerService {
                     PlayerLoggedAchievementDTO playerLoggedAchievementDto = PlayerMapper.mapToPlayerLoggedAchievementDto(loggedAchievementEntity);
                     playerLoggedAchievementDtos.add(playerLoggedAchievementDto);
 
-                }
+                }   
             }
             return playerLoggedAchievementDtos;
         }
@@ -188,5 +188,24 @@ public class PlayerServiceImpl implements PlayerService {
         return PlayerMapper.mapToPlayerLoggedAchievementDto(loggedAchievementEntity);
     }
 
+    @Override
+    @Transactional
+    public void updateIndividualPlayerAvatar(String playername, String base64Avatar) {
+        PlayerEntity playerEntity = getPlayerEntityByPlayername(playername);
+        if (!(playerEntity instanceof IndividualPlayerEntity individualPlayer)) {
+            throw new ResourceNotFoundException("Player with playername '" + playername + "' is not an individual player.");
+        }
+        individualPlayer.setAvatar(base64Avatar);
+    }
+
+    @Override
+    @Transactional
+    public void updateTeamPlayerLogo(String playername, String base64Logo) {
+        PlayerEntity playerEntity = getPlayerEntityByPlayername(playername);
+        if (!(playerEntity instanceof TeamPlayerEntity teamPlayer)) {
+            throw new ResourceNotFoundException("Player with playername '" + playername + "' is not a team player.");
+        }
+        teamPlayer.setLogo(base64Logo);
+    }
 
 }

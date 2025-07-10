@@ -166,4 +166,12 @@ export class LearningdashboardService {
       { headers: { 'Content-Type': 'text/plain' } }
     );
   }
+
+  updateTeamPlayerLogo(playername: string, base64Logo: string) {
+    return this.http.put(
+      'http://localhost:8081/api/players/teams/' + playername + '/logo',
+      base64Logo,
+      { headers: { 'Content-Type': 'text/plain' } }
+    );
+  }
 }

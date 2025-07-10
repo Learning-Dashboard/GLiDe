@@ -19,4 +19,10 @@ public interface PlayerService {
 
     PlayerLoggedAchievementDTO setPlayerLoggedAchievementViewed(String playerPlayername, Long loggedAchievementId, Boolean viewed);
 
+    void updateIndividualPlayerAvatar(String playername, String base64Avatar);
+
+    void updateTeamPlayerLogo(String playername, String base64Logo);
+
+
+
 }

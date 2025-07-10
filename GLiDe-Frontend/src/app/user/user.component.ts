@@ -6,6 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
 import {LearningdashboardService} from "../services/learningdashboard.service";
 import {forkJoin, switchMap} from "rxjs";
 import {DomSanitizer} from "@angular/platform-browser";
@@ -27,6 +28,7 @@ import {ToastrService} from "ngx-toastr";
     MatSelectModule,
     MatRadioModule,
     MatCardModule,
+    MatIconModule,
     ReactiveFormsModule,
     FormsModule,
     NgIf,
@@ -42,6 +44,8 @@ export class UserComponent {
   protected nickname: string = '';
 
   protected selectedPlayer: any;
+  protected selectedFileName: string = '';
+  protected selectedTeamLogoFileName: string = '';
 
   addressForm = this.fb.group({
     company: null,
@@ -128,22 +132,17 @@ export class UserComponent {
 
   onPlayerSelected(playername: string): void {
     this.selectedPlayer = playername;
-    console.log("Selected player:", this.selectedPlayer);
-    this.saveUserData(); // actualiza localStorage siempre
-    console.log('Guardando datos de:', this.selectedPlayer);
+    this.saveUserData(); 
   }
   
 
   saveUserData(): void {
     const selected = this.result.find((x: { playername: string }) => x.playername === this.selectedPlayer);
-    console.log("Trobat:", selected);
 
     if (!selected) return;
 
-    console.table(this.result);
-
     function normalizeName(str: string): string {
-      return str.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // elimina accents
+      return str.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); 
     }
     
     const normalizedUsername = normalizeName(selected.learningdashboardUsername);
@@ -154,7 +153,6 @@ export class UserComponent {
     localStorage.setItem('selectedPlayer', this.selectedPlayer);
 
     localStorage.setItem('username', normalizedUsername);
-    console.log("→ Guardant username:", normalizedUsername);
     localStorage.setItem('githubUsername', selected.githubUsername);
     localStorage.setItem('taigaUsername', selected.taigaUsername);
     localStorage.setItem('project', selected.project);
@@ -237,5 +235,70 @@ export class UserComponent {
         this.toastr.error('Error actualitzant el nickname');
       }
     });
+  }
+
+  onAvatarSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+
+    if (!input.files || input.files.length === 0) return;
+
+    const file = input.files[0];
+    this.selectedFileName = file.name;
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const base64Avatar = (reader.result as string).split(',')[1]; 
+      const playername = this.selectedPlayer;
+
+      this.service.updateIndividualPlayerAvatar(playername, base64Avatar).subscribe({
+        next: () => {
+          alert('Avatar updated successfully!');
+          const playerIndex = this.players.findIndex((p: any) => p.playername === playername);
+          if (playerIndex !== -1) {
+            this.players[playerIndex].avatar = this.sanitizer.bypassSecurityTrustResourceUrl('data:image/jpg;base64,' + base64Avatar);
+          }
+        },
+        error: (err) => {
+          console.error('Error updating avatar:', err);
+          alert('Error updating avatar');
+        }
+      });
+    };
+
+    reader.readAsDataURL(file); 
+  }
+
+  onTeamLogoSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+
+    const file = input.files[0];
+    this.selectedTeamLogoFileName = file.name;
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const base64Logo = (reader.result as string).split(',')[1];
+      const teamname = this.result.find((x: any) => x.playername === this.selectedPlayer)?.teamPlayername;
+
+      if (teamname) {
+        this.service.updateTeamPlayerLogo(teamname, base64Logo).subscribe({
+          next: () => {
+            alert('Logo updated successfully!');
+            const teamIndex = this.teams.findIndex((t: any) => t.playername === teamname);
+            if (teamIndex !== -1) {
+              console.log('Updating logo for team:', teamname);
+              this.teams[teamIndex].logo = this.sanitizer.bypassSecurityTrustResourceUrl('data:image/jpg;base64,' + base64Logo);
+            } else {
+              console.log('Team not found for logo update:', teamname);
+            }
+          },
+          error: (err) => {
+            console.error('Error updating logo:', err);
+            alert('Error updating logo');
+          }
+        });
+      }
+    };
+    reader.readAsDataURL(file);
   }
 }

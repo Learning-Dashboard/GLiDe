@@ -85,4 +85,28 @@ public class PlayerController {
         PlayerLoggedAchievementDTO playerLoggedAchievementDto = playerService.setPlayerLoggedAchievementViewed(playerPlayername, loggedAchievementId, viewed);
         return ResponseEntity.ok(playerLoggedAchievementDto);
     }
+
+    @Operation(summary = "Update individual player avatar", description = "Update the avatar of an individual player. The player is identified by its playername. The avatar must be a base64 encoded string.", tags = { "players" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK: Avatar updated successfully.", content = @Content),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND: Individual player with the given playername not found.", content = @Content)
+    })
+    @PutMapping("/individuals/{playername}/avatar")
+    public ResponseEntity<Void> updateIndividualPlayerAvatar(@PathVariable String playername, @RequestBody String base64Avatar) {
+        playerService.updateIndividualPlayerAvatar(playername, base64Avatar);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "Update team player logo", description = "Update the logo of a team player. The team is identified by its playername. The logo must be a base64 encoded string.", tags = { "players" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK: Logo updated successfully.", content = @Content),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND: Team player with the given playername not found.", content = @Content)
+    })
+    @PutMapping("/teams/{playername}/logo")
+    public ResponseEntity<Void> updateTeamPlayerLogo(@PathVariable String playername, @RequestBody String base64Logo) {
+        playerService.updateTeamPlayerLogo(playername, base64Logo);
+        return ResponseEntity.ok().build();
+    }
+
+
 }

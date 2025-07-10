@@ -97,3 +97,14 @@
   height: 56px;
   margin-bottom: 1.25em;
 }
+
+.avatar-box {
+  margin-top: 10px;
+}
+
+.avatar-field {
+  width: 250px;
+  margin-top: 8px;
+}
+
+
