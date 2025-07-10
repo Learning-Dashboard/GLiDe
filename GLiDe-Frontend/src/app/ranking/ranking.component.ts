@@ -61,9 +61,23 @@ export class RankingComponent {
         if (this.position == 1) this.maxPoints = this.data[a].points;
         let percent = (this.data[a].points / this.maxPoints) * 100;
         let name: any;
-        if ((this.data[a].playername == this.teamPlayerName || this.data[a].playername == this.individualPlayerName) || anonymization == "None") name = this.getDisplayName(this.data[a]);
-        else if (anonymization == "Partial" && this.position < 4) name = this.getDisplayName(this.data[a]);
+        if ((this.data[a].playername == this.teamPlayerName || this.data[a].playername == this.individualPlayerName) || anonymization == "None") {
+          const displayName = this.getDisplayName(this.data[a]);
+          console.log("Display Name:", displayName);
+          const originalName = this.data[a].playername;
+          console.log("Original Name:", originalName);
+          name = displayName === originalName ? displayName : `${originalName} (${displayName})`;
+
+        }
+        else if (anonymization == "Partial" && this.position < 4) {
+          const displayName = this.getDisplayName(this.data[a]);
+          console.log("Display Name:", displayName);
+          const originalName = this.data[a].playername;
+          console.log("Original Name:", originalName);
+          name = displayName === originalName ? displayName : `${originalName} (${displayName})`;
+        }
         else name = "-";
+        console.log("Name:", name);
         this.list.push({name: name, points: this.data[a].achievementunits, position: this.position, percent: percent});
       }
 
@@ -77,6 +91,7 @@ export class RankingComponent {
   }
 
   public getDisplayName(player: any): string {
+    console.log("Player:", player);
     if (player?.nickname) return player.nickname;
 
     const name = player?.playername ?? player?.name ?? '';
@@ -84,17 +99,31 @@ export class RankingComponent {
   }
 
   private loadStudentNicknames() {
-    const project = localStorage.getItem('project');
-    if (project) {
-      this.service.getProjectStudentsWithNicknames(project).subscribe((students: any) => {
-        if (Array.isArray(students)) {
-          students.forEach((student: any) => {
-            if (student.nickname) {
-              this.studentNicknamesMap.set(student.name, student.nickname);
-            }
-          });
-        }
-      });
+    this.service.getAllStudentNicknames().subscribe((students: any) => {
+      if (Array.isArray(students)) {
+        students.forEach((student: any) => {
+          if (student.nickname) {
+            this.studentNicknamesMap.set(student.name, student.nickname);
+          }
+        });
+      }
+    });
+  }
+
+  public formatPlayerName(name: string): string {
+    if (!name || name === '-') {
+      return name;
+    }
+    
+    // Check if the name contains parentheses (nickname)
+    const parenIndex = name.indexOf('(');
+    if (parenIndex !== -1) {
+      const playerName = name.substring(0, parenIndex).trim();
+      const nickname = name.substring(parenIndex);
+      return `<strong>${playerName}</strong> <span class="nickname">${nickname}</span>`;
+    } else {
+      // No nickname, just make the name bold
+      return `<strong>${name}</strong>`;
     }
   }
 }

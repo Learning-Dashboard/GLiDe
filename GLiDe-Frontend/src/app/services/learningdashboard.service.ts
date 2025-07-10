@@ -155,10 +155,15 @@ export class LearningdashboardService {
     });
   }
 
-  getProjectStudentsWithNicknames(project: string) {
-    let params = new HttpParams()
-      .set('project', project);
-    return this.http.get(this.backUrl + '/students/project/nicknames', {params: params});
+  getAllStudentNicknames() {
+    return this.http.get(this.backUrl + '/students/nicknames');
   }
 
+  updateIndividualPlayerAvatar(playername: string, base64Avatar: string) {
+    return this.http.put(
+      'http://localhost:8081/api/players/individuals/' + playername + '/avatar',
+      base64Avatar,
+      { headers: { 'Content-Type': 'text/plain' } }
+    );
+  }
 }

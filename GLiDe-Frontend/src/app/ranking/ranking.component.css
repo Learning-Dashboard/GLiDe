@@ -9,5 +9,40 @@
 }
 
 .mat-column-name {
-  width: 150px;
+  width: 300px;
+  padding-right: 20px;
+}
+
+.player-info {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.player-name {
+  font-size: 14px;
+}
+
+.player-name strong {
+  font-weight: bold;
+}
+
+.nickname {
+  font-weight: normal;
+  color: #666;
+}
+
+.mat-column-points {
+  flex: 1;
+  min-width: 200px;
+}
+
+.full-width-table .mat-header-cell {
+  font-weight: bold;
+  color: #333;
+}
+
+.full-width-table .mat-cell {
+  padding: 12px 8px;
 }

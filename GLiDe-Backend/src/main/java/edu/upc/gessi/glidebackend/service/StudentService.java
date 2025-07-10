@@ -11,5 +11,5 @@ public interface StudentService {
     List<IndividualPlayerDto> getStudentPlayers(String idToken);
     List<IndividualPlayerDto> getStudentsByGame(String subjectAcronym, Integer course, String period);
     void updateNickname(String idToken, String nickname);
-    List<StudentNicknameDto> getProjectStudentsWithNicknames(String project);
+    List<StudentNicknameDto> getAllStudentNicknames();
 }

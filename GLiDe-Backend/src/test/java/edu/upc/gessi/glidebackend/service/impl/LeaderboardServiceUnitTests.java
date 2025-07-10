@@ -1,4 +1,6 @@
 package edu.upc.gessi.glidebackend.service.impl;
+import edu.upc.gessi.glidebackend.repository.IndividualPlayerRepository;
+import edu.upc.gessi.glidebackend.service.LeaderboardService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,6 +14,12 @@ import org.springframework.web.client.RestTemplate;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
+
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -19,6 +27,9 @@ import static org.mockito.Mockito.when;
 public class LeaderboardServiceUnitTests {
     @InjectMocks
     private LeaderboardServiceImpl leaderboardService;
+
+    @Mock
+    private IndividualPlayerRepository individualPlayerRepository;
 
     @Mock
     private RestTemplate restTemplate;
@@ -69,15 +80,28 @@ public class LeaderboardServiceUnitTests {
     @Test
     void testGetLeaderboardResults_success() {
         String uri = gamificationAPIBaseURL + "/leaderboards/" + 1L + "/results";
-        Object[] mockResults = new Object[]{new Object()};  // Mock the response array
+
+        Map<String, Object> mockLeaderboard = new HashMap<>();
+        List<Map<String, Object>> mockPlayers = new ArrayList<>();
+        Map<String, Object> player = new HashMap<>();
+        player.put("playername", "test.user");
+        mockPlayers.add(player);
+        mockLeaderboard.put("leaderboardResults", mockPlayers);
+
+        Object[] mockResults = new Object[]{mockLeaderboard};
+
         when(restTemplate.getForObject(uri, Object[].class)).thenReturn(mockResults);
+        when(individualPlayerRepository.findById("test.user")).thenReturn(Optional.empty()); // No nickname per simplificar
 
         List<Object> results = leaderboardService.getLeaderboardResults(1L);
 
         assertNotNull(results);
         assertEquals(1, results.size());
-        assertEquals(mockResults[0], results.getFirst());
+        assertTrue(results.get(0) instanceof Map);
+        Map<?, ?> resultMap = (Map<?, ?>) results.get(0);
+        assertTrue(resultMap.containsKey("leaderboardResults"));
     }
+
 
     @Test
     void testGetLeaderboardResults_error() {

@@ -150,18 +150,15 @@ export class IndividualgamificationComponent {
   }
 
   private loadStudentNicknames(): void {
-    const project = this.project_name; 
-    if (project) {
-      this.service.getProjectStudentsWithNicknames(project).subscribe((response: any) => {
-        const students = response as any[];
-        console.log('Students with nicknames:', students);
-        students.forEach(student => {
-          if (student.nickname) {
-            this.studentNicknamesMap.set(student.name, student.nickname);
-          }
-        });
+    this.service.getAllStudentNicknames().subscribe((response: any) => {
+      const students = response as any[];
+      console.log('Students with nicknames:', students);
+      students.forEach(student => {
+        if (student.nickname) {
+          this.studentNicknamesMap.set(student.name, student.nickname);
+        }
       });
-    }
+    });
   }
 
   public getDisplayName(player: any): string {

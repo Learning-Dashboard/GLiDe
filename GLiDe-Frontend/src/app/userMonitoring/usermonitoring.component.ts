@@ -586,22 +586,20 @@ export class UsermonitoringComponent {
   }
 
   private loadStudentNicknames(): void {
-    if (this.project_name) {
-      this.service.getProjectStudentsWithNicknames(this.project_name).subscribe(
-        (students: Object) => {
-          this.studentNicknamesMap.clear();
-          const studentsArray = students as any[];
-          studentsArray.forEach(student => {
-            if (student.nickname) {
-              this.studentNicknamesMap.set(student.name, student.nickname);
-            }
-          });
-        },
-        (error) => {
-          console.error('Error loading student nicknames:', error);
-        }
-      );
-    }
+    this.service.getAllStudentNicknames().subscribe(
+      (students: Object) => {
+        this.studentNicknamesMap.clear();
+        const studentsArray = students as any[];
+        studentsArray.forEach(student => {
+          if (student.nickname) {
+            this.studentNicknamesMap.set(student.name, student.nickname);
+          }
+        });
+      },
+      (error) => {
+        console.error('Error loading student nicknames:', error);
+      }
+    );
   }
 
   public getDisplayName(player: any): string {

@@ -51,9 +51,9 @@ public class StudentController {
     }
 
     @CrossOrigin(origins = "http://localhost:4201")
-    @GetMapping(value="/project/nicknames")
-    public ResponseEntity<List<StudentNicknameDto>> getProjectStudentsWithNicknames(@RequestParam String project) {
-        List<StudentNicknameDto> students = studentService.getProjectStudentsWithNicknames(project);
+    @GetMapping(value="/nicknames")
+    public ResponseEntity<List<StudentNicknameDto>> getAllStudentNicknames() {
+        List<StudentNicknameDto> students = studentService.getAllStudentNicknames();
         return ResponseEntity.ok(students);
     }
 }

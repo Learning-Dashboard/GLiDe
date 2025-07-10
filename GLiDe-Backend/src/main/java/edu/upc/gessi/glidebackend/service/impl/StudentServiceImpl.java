@@ -69,10 +69,8 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     @Transactional
-    public List<StudentNicknameDto> getProjectStudentsWithNicknames(String project) {
-        List<IndividualPlayerEntity> individualPlayerEntities = individualPlayerRepository
-                .findByProject(project);
-        
+    public List<StudentNicknameDto> getAllStudentNicknames() {
+        List<IndividualPlayerEntity> individualPlayerEntities = individualPlayerRepository.findAll();
         return individualPlayerEntities.stream()
                 .map(player -> {
                     StudentUserEntity student = player.getStudentUserEntity();
@@ -81,6 +79,7 @@ public class StudentServiceImpl implements StudentService {
                             student.getNickname()
                     );
                 })
+                .filter(studentNicknameDto -> studentNicknameDto.getNickname() != null && !studentNicknameDto.getNickname().isEmpty())
                 .distinct() 
                 .collect(Collectors.toList());
     }

@@ -65,15 +65,15 @@ export class LeaderboardComponent {
       this.validLeaderboard = position1.length === 1 && position2.length === 1 && position3.length === 1;
       if (this.validLeaderboard) {
         if (anonymization !== 'Full'){
-          name[1] = this.getDisplayName(position1[0]);
-          name[0] = this.getDisplayName(position2[0]);
-          name[2] = this.getDisplayName(position3[0]);
+          name[1] = this.buildNameWithNickname(position1[0]);
+          name[0] = this.buildNameWithNickname(position2[0]);
+          name[2] = this.buildNameWithNickname(position3[0]);
         }
         else {
           let individualPlayername = localStorage.getItem("individualPlayername");
-          if (position1[0].playername === individualPlayername) name[1] = this.getDisplayName(position1[0]);
-          if (position2[0].playername === individualPlayername) name[0] = this.getDisplayName(position2[0]);
-          if (position3[0].playername === individualPlayername) name[2] = this.getDisplayName(position3[0]);
+          if (position1[0].playername === individualPlayername) name[1] = this.buildNameWithNickname(position1[0]);
+          if (position2[0].playername === individualPlayername) name[0] = this.buildNameWithNickname(position2[0]);
+          if (position3[0].playername === individualPlayername) name[2] = this.buildNameWithNickname(position3[0]);
         }
 
         achievementUnit[1] = position1[0].achievementunits;
@@ -222,18 +222,15 @@ export class LeaderboardComponent {
   }
 
   private loadStudentNicknames() {
-    const project = localStorage.getItem('project');
-    if (project) {
-      this.service.getProjectStudentsWithNicknames(project).subscribe((students: any) => {
-        if (Array.isArray(students)) {
-          students.forEach((student: any) => {
-            if (student.nickname) {
-              this.studentNicknamesMap.set(student.name, student.nickname);
-            }
-          });
-        }
-      });
-    }
+    this.service.getAllStudentNicknames().subscribe((students: any) => {
+      if (Array.isArray(students)) {
+        students.forEach((student: any) => {
+          if (student.nickname) {
+            this.studentNicknamesMap.set(student.name, student.nickname);
+          }
+        });
+      }
+    });
   }
 
   public getDisplayName(player: any): string {
@@ -241,5 +238,11 @@ export class LeaderboardComponent {
 
     const name = player?.playername ?? player?.name ?? '';
     return this.studentNicknamesMap.get(name) || name;
+  }
+
+  private buildNameWithNickname(player: any): string {
+    const displayName = this.getDisplayName(player);
+    const originalName = player?.playername ?? player?.name ?? '';
+    return displayName === originalName ? displayName : `${originalName} (${displayName})`;
   }
 }
