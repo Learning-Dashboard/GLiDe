@@ -7,52 +7,56 @@
       <mat-radio-group [(ngModel)]="selectedPlayer" (ngModelChange)="onPlayerSelected($event)">
         <mat-radio-button class="player-card" *ngFor="let res of result; let i = index" [value]="res.playername">
           <div class="radio-content">
-            <img mat-card-avatar [src]="players[i].avatar" alt="avatar" class="avatar">
-            <span class="name">{{ res.nickname || res.playername }}</span>
-            <div class="details">
-              <span class="level">Level: {{ players[i].level }}</span>
-              <span class="points">Points: {{ players[i].points }}</span>
+            <div class="player-row">
+              <img mat-card-avatar [src]="players[i].avatar" alt="avatar" class="avatar">
+              <span class="name">{{ res.nickname || res.playername }}</span>
+              <div class="details">
+                <span class="level">Level: {{ players[i].level }}</span>
+                <span class="points">Points: {{ players[i].points }}</span>
+              </div>
             </div>
-            <img mat-card-avatar [src]="teams[i].logo" alt="logo" class="avatar">
-            <span class="team-name">{{ teams[i].playername }}</span>
-            <div class="details">
-              <span class="team-level">Team Level: {{ teams[i].level }}</span>
-              <span class="team-points">Team Points: {{ teams[i].points }}</span>
+            <div class="team-row">
+              <img mat-card-avatar [src]="teams[i].logo" alt="logo" class="avatar team-avatar">
+              <span class="team-name">{{ teams[i].playername }}</span>
+              <div class="details">
+                <span class="team-level">Team Level: {{ teams[i].level }}</span>
+                <span class="team-points">Team Points: {{ teams[i].points }}</span>
+              </div>
             </div>
           </div>
         </mat-radio-button>
       </mat-radio-group>
 
-      <!-- Formulari nickname -->
-      <div class="nickname-box" *ngIf="selectedPlayer">
-        <mat-form-field appearance="fill" class="nickname-field">
-          <mat-label>Nickname</mat-label>
-          <input matInput [(ngModel)]="nickname" placeholder="Write a nickname" />
-        </mat-form-field>
-        <button mat-raised-button color="primary" class="nickname-save-button" (click)="updateNickname()">Save</button>
-      </div>
-      
-      <!-- Canvi d'avatar -->
-      <div class="avatar-box" *ngIf="selectedPlayer">
-        <mat-form-field appearance="fill" class="avatar-field">
-          <mat-label>Change avatar</mat-label>
-          <input matInput [value]="selectedFileName" readonly />
-          <button mat-icon-button matSuffix (click)="avatarInput.click()" aria-label="Select avatar">
-            <mat-icon>upload</mat-icon>
-          </button>
-          <input #avatarInput type="file" accept="image/*" hidden (change)="onAvatarSelected($event)" />
-        </mat-form-field>
-      </div>
-      <!-- Canvi de logo d'equip -->
-      <div class="avatar-box" *ngIf="selectedPlayer">
-        <mat-form-field appearance="fill" class="avatar-field">
-          <mat-label>Change team logo</mat-label>
-          <input matInput [value]="selectedTeamLogoFileName" readonly />
-          <button mat-icon-button matSuffix (click)="teamLogoInput.click()" aria-label="Select team logo">
-            <mat-icon>upload</mat-icon>
-          </button>
-          <input #teamLogoInput type="file" accept="image/*" hidden (change)="onTeamLogoSelected($event)" />
-        </mat-form-field>
+      <div class="controls-section" *ngIf="selectedPlayer">
+        <div class="nickname-row">
+          <mat-form-field appearance="fill" class="nickname-field">
+            <mat-label>Nickname</mat-label>
+            <input matInput [(ngModel)]="nickname" placeholder="Write a nickname" maxlength="20" />
+          </mat-form-field>
+          <button mat-raised-button color="primary" class="nickname-save-button" (click)="updateNickname()">Save</button>
+        </div>
+        <div class="avatar-logo-row">
+          <div class="avatar-box">
+            <mat-form-field appearance="fill" class="avatar-field">
+              <mat-label>Change avatar</mat-label>
+              <input matInput [value]="selectedFileName" readonly />
+              <button mat-icon-button matSuffix (click)="avatarInput.click()" aria-label="Select avatar">
+                <mat-icon>upload</mat-icon>
+              </button>
+              <input #avatarInput type="file" accept="image/*" hidden (change)="onAvatarSelected($event)" />
+            </mat-form-field>
+          </div>
+          <div class="avatar-box">
+            <mat-form-field appearance="fill" class="avatar-field">
+              <mat-label>Change team logo</mat-label>
+              <input matInput [value]="selectedTeamLogoFileName" readonly />
+              <button mat-icon-button matSuffix (click)="teamLogoInput.click()" aria-label="Select team logo">
+                <mat-icon>upload</mat-icon>
+              </button>
+              <input #teamLogoInput type="file" accept="image/*" hidden (change)="onTeamLogoSelected($event)" />
+            </mat-form-field>
+          </div>
+        </div>
       </div>
     </div>
   </mat-card-content>
